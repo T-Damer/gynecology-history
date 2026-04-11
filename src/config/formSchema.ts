@@ -1,0 +1,288 @@
+import { FieldConfig } from 'types/Patient'
+
+const numberFieldDescription = 'Числовое поле без верхнего ограничения.'
+const freeTextDescription = 'Свободный ввод.'
+const multiValueDescription = 'Если нужно, перечислите несколько значений через запятую.'
+
+const yearsOptions = [
+  'впервые выявлен',
+  'год',
+  'два',
+  '3',
+  '4',
+  '5',
+  'более 5 лет',
+]
+
+const yesNoCapitalized = ['Да', 'Нет']
+const yesNoLowerCase = ['да', 'нет']
+
+export const passportFieldConfigs: FieldConfig[] = [
+  {
+    key: 'telegram',
+    title: 'тел',
+    placeholder: '@patient',
+    description: 'Дополнительный контакт.',
+  },
+  {
+    key: 'fullName',
+    title: 'фио',
+    placeholder: 'Иванова Мария Петровна',
+  },
+  {
+    key: 'birthDate',
+    title: 'дата рождения',
+    type: 'date',
+  },
+  {
+    key: 'age',
+    title: 'Возраст',
+    type: 'number',
+    description: numberFieldDescription,
+  },
+  {
+    key: 'phone',
+    title: 'телефон',
+    placeholder: '+7 999 123-45-67',
+  },
+]
+
+export const visitIntervalConfig: FieldConfig = {
+  key: 'visitInterval',
+  title: 'Явка',
+  options: [
+    '3 мес',
+    '6 мес',
+    '9 мес',
+    'год',
+    '1,5 года',
+    '2 года',
+    '2,5 года',
+    '3 года',
+    '3,5 года',
+    '4 года',
+    '4.5 года',
+    '5 лет',
+    '6 лет',
+    '7 лет',
+  ],
+  description: 'Для первичного визита можно оставить пустым.',
+}
+
+export const visitFieldConfigs: FieldConfig[] = [
+  {
+    key: 'vaccination',
+    title: 'вакцинация',
+    options: ['до начала ПЖ', 'после'],
+    group: 'Анамнез',
+  },
+  {
+    key: 'kpp',
+    title: 'КПП',
+    options: ['1', '1а - тоже 1', '1б - не изв какая', '2', '3', '4', '5', 'более 5'],
+    group: 'Анамнез',
+  },
+  {
+    key: 'smoking',
+    title: 'курение',
+    options: ['менее 10', 'более 10', 'кальян', 'вейп', 'стики'],
+    group: 'Анамнез',
+  },
+  {
+    key: 'pregnancies',
+    title: 'Беременности',
+    type: 'number',
+    description: numberFieldDescription,
+    group: 'Анамнез',
+  },
+  {
+    key: 'births',
+    title: 'Роды',
+    type: 'number',
+    description: numberFieldDescription,
+    group: 'Анамнез',
+  },
+  {
+    key: 'abortions',
+    title: 'Аборты',
+    type: 'number',
+    description: numberFieldDescription,
+    group: 'Анамнез',
+  },
+  {
+    key: 'miscarriages',
+    title: 'Выкидыши',
+    type: 'number',
+    description: numberFieldDescription,
+    group: 'Анамнез',
+  },
+  {
+    key: 'ectopicPregnancies',
+    title: 'Внематочная',
+    type: 'number',
+    description: numberFieldDescription,
+    group: 'Анамнез',
+  },
+  {
+    key: 'intrauterineInterventions',
+    title: 'Были ли инструментальные внутриматочные вмешательства',
+    options: ['0', '1'],
+    description: '0 - нет, 1 - да.',
+    group: 'Анамнез',
+  },
+  {
+    key: 'operationsDescription',
+    title: 'Описание операций - ручной ввод',
+    type: 'textarea',
+    description: freeTextDescription,
+    group: 'Анамнез',
+  },
+  {
+    key: 'previousSti',
+    title: 'Перенесенные ранее ИППП',
+    type: 'textarea',
+    placeholder: 'ВПЧ, Хламидии',
+    description: multiValueDescription,
+    group: 'Анамнез',
+  },
+  {
+    key: 'hpvYears',
+    title: 'Сколько лет ВПЧ',
+    options: yearsOptions,
+    group: 'Анамнез',
+  },
+  {
+    key: 'floraChanges',
+    title: 'Были ли изменеия флоры',
+    options: yesNoCapitalized,
+    group: 'Анамнез',
+  },
+  {
+    key: 'treated',
+    title: 'Лечила ли',
+    options: yesNoCapitalized,
+    group: 'Анамнез',
+  },
+  {
+    key: 'cytologyChangesHistory',
+    title: 'Изменения вцитологии',
+    options: ['Норма', 'ASCUS', 'LSIL', 'HSIL', 'AGC', 'AIS', 'ПКР', 'Аденокарцинома'],
+    group: 'Анамнез',
+  },
+  {
+    key: 'partnerChanges',
+    title: 'Была ли в течение этого периода смена партнера',
+    type: 'number',
+    description: numberFieldDescription,
+    group: 'Анамнез',
+  },
+  {
+    key: 'cervixOperations',
+    title: 'Операции на шейке',
+    options: ['биопсия', 'эксцизия'],
+    group: 'Анамнез',
+  },
+  {
+    key: 'epitheliumChanges',
+    title: 'Изменения эпителия',
+    options: ['лейкоплакия', 'CIN I', 'CIN II', 'CIN III', 'ПКК рак', 'Аденокарцинома'],
+    group: 'Анамнез',
+  },
+  {
+    key: 'additional',
+    title: 'Дополнительно',
+    type: 'textarea',
+    description: freeTextDescription,
+    group: 'Анамнез',
+  },
+  {
+    key: 'ph',
+    title: 'рН',
+    options: ['до 4,5', '5', '5,5', '6', '6,5 и выше'],
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'dischargeType',
+    title: 'Вид выделений',
+    options: ['норма', 'бели обильно', 'слизь', 'зеленые'],
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'ectopia',
+    title: 'эктопия/эктропион',
+    options: ['0 - нет', '1 - менее трети', '2 - половина', '3 более половины'],
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'colposcopy',
+    title: 'Кольпоскопия',
+    options: ['норма', 'АКС1', 'АКС2', 'ДКС', 'НКП АКС', 'Подозрение на инвазию', 'Рак'],
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'cytology',
+    title: 'Цитология',
+    options: ['Норма', 'ASCUS', 'LSIL', 'HSIL', 'AGC', 'AIS', 'ПКР', 'Аденокарцинома'],
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'flora',
+    title: 'Флора',
+    options: ['норма', 'смешанная', 'АВ'],
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'pcr',
+    title: 'ПЦР',
+    options: ['Норма', 'Анаэробы', 'Аэробы'],
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'hpvType',
+    title: 'ВПЧ тип',
+    placeholder: '16, 18',
+    description: freeTextDescription,
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'hpvLog',
+    title: 'ВПЧ логарифм',
+    placeholder: '3.2',
+    description: freeTextDescription,
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'sti',
+    title: 'ИППП',
+    type: 'textarea',
+    placeholder: 'Хламидии',
+    description: multiValueDescription,
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'therapy',
+    title: 'назначенная терапия',
+    type: 'textarea',
+    placeholder: 'Нормализация микробиоты',
+    description: multiValueDescription,
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'vitaminD',
+    title: 'Вит Д',
+    options: yesNoLowerCase,
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'metabolismCompensation',
+    title: 'Компенсация метаболизма',
+    options: yesNoLowerCase,
+    group: 'Осмотр и лечение',
+  },
+  {
+    key: 'compensationWork',
+    title: 'Работа по компенсации',
+    options: yesNoLowerCase,
+    group: 'Осмотр и лечение',
+  },
+]

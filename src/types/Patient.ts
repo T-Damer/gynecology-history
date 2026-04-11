@@ -1,0 +1,100 @@
+import { v4 } from 'uuid'
+import {
+  passportFieldConfigs,
+  visitFieldConfigs,
+  visitIntervalConfig,
+} from 'config/formSchema'
+
+export type InputType = 'number' | 'date' | 'string' | 'textarea'
+export type PlainValue = number | string | undefined
+
+export interface FieldConfig {
+  key: string
+  title: string
+  type?: InputType
+  options?: string[]
+  placeholder?: string
+  description?: string
+  step?: number
+  group?: string
+}
+
+export interface FieldState extends FieldConfig {
+  value?: PlainValue
+}
+
+export interface Visit {
+  id: string
+  visitNumber: number
+  interval: FieldState
+  fields: FieldState[]
+}
+
+export interface Patient {
+  passport: FieldState[]
+  visits: Visit[]
+}
+
+function cloneField(config: FieldConfig): FieldState {
+  return { ...config, value: undefined }
+}
+
+export function createVisit(visitNumber: number): Visit {
+  return {
+    id: v4(),
+    visitNumber,
+    interval: cloneField(visitIntervalConfig),
+    fields: visitFieldConfigs.map(cloneField),
+  }
+}
+
+function applyInitialValues(
+  fields: FieldState[],
+  initialValues?: Partial<Record<string, PlainValue>>
+) {
+  if (!initialValues) return fields
+
+  return fields.map((field) => ({
+    ...field,
+    value: initialValues[field.key] ?? field.value,
+  }))
+}
+
+export function createPatient(
+  initialPassport?: Partial<Record<string, PlainValue>>
+): Patient {
+  return {
+    passport: applyInitialValues(
+      passportFieldConfigs.map(cloneField),
+      initialPassport
+    ),
+    visits: [createVisit(1)],
+  }
+}
+
+export function reindexVisits(visits: Visit[]) {
+  return visits.map((visit, index) => ({
+    ...visit,
+    visitNumber: index + 1,
+  }))
+}
+
+export function clonePatient(patient: Patient): Patient {
+  return {
+    passport: patient.passport.map((field) => ({ ...field })),
+    visits: patient.visits.map((visit, index) => ({
+      id: v4(),
+      visitNumber: index + 1,
+      interval: { ...visit.interval },
+      fields: visit.fields.map((field) => ({ ...field })),
+    })),
+  }
+}
+
+export function getFieldValue(fields: FieldState[], key: string) {
+  return fields.find((field) => field.key === key)?.value
+}
+
+export function getFieldTitle(fields: FieldState[], key: string) {
+  return fields.find((field) => field.key === key)?.title || key
+}
