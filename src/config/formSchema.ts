@@ -1,7 +1,7 @@
 import type { FieldConfig } from 'types/Patient'
 
-const numberFieldDescription = 'Числовое поле без верхнего ограничения.'
-const freeTextDescription = 'Свободный ввод.'
+const numberFieldDescription = 'Введите число'
+const freeTextDescription = 'Свободный ввод'
 const multiValueDescription =
   'Если нужно ввести несколько значений, вводите их в следующее поле.'
 
@@ -68,28 +68,28 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'vaccination',
     title: 'вакцинация',
-    options: ['до начала ПЖ', 'после'],
+    options: ['До начала половой жизни', 'После начала половой жизни'],
     group: 'Анамнез',
   },
   {
     key: 'kpp',
     title: 'КПП',
-    options: [
-      '1',
-      '1а - тоже 1',
-      '1б - не изв какая',
-      '2',
-      '3',
-      '4',
-      '5',
-      'более 5',
-    ],
+    options: ['1', '1а', '1б', '2', '3', '4', '5', 'более 5'],
     group: 'Анамнез',
   },
   {
     key: 'smoking',
     title: 'курение',
-    options: ['менее 10', 'более 10', 'кальян', 'вейп', 'стики'],
+    options: [
+      'Сигареты менее 10 лет',
+      'Сигареты более 10 лет',
+      'Кальян менее 10 лет',
+      'Кальян более 10 лет',
+      'Вейп менее 10 лет',
+      'Вейп более 10 лет',
+      'Стики менее 10 лет',
+      'Стики более 10 лет',
+    ],
     group: 'Анамнез',
   },
   {
@@ -122,7 +122,7 @@ export const visitFieldConfigs: FieldConfig[] = [
   },
   {
     key: 'ectopicPregnancies',
-    title: 'Внематочная',
+    title: 'Внематочная беременность',
     type: 'number',
     description: numberFieldDescription,
     group: 'Анамнез',
@@ -130,13 +130,12 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'intrauterineInterventions',
     title: 'Были ли инструментальные внутриматочные вмешательства',
-    options: ['0', '1'],
-    description: '0 - нет, 1 - да.',
+    options: yesNoCapitalized,
     group: 'Анамнез',
   },
   {
     key: 'operationsDescription',
-    title: 'Описание операций - ручной ввод',
+    title: 'Описание операций',
     type: 'textarea',
     description: freeTextDescription,
     group: 'Анамнез',
@@ -145,7 +144,7 @@ export const visitFieldConfigs: FieldConfig[] = [
     key: 'previousSti',
     title: 'Перенесенные ранее ИППП',
     type: 'textarea',
-    placeholder: 'ВПЧ, Хламидии',
+    placeholder: 'Хламидиоз',
     description: multiValueDescription,
     multiValue: true,
     group: 'Анамнез',
@@ -231,7 +230,12 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'ectopia',
     title: 'эктопия/эктропион',
-    options: ['0 - нет', '1 - менее трети', '2 - половина', '3 более половины'],
+    options: [
+      '0 - нет',
+      '1 - менее трети',
+      '2 - половина',
+      '3 - более половины',
+    ],
     group: 'Осмотр и лечение',
   },
   {
@@ -266,7 +270,7 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'flora',
     title: 'Флора',
-    options: ['норма', 'смешанная', 'АВ'],
+    options: ['Норма', 'Смешанная', 'АВ'],
     group: 'Осмотр и лечение',
   },
   {
@@ -280,6 +284,8 @@ export const visitFieldConfigs: FieldConfig[] = [
     title: 'ВПЧ тип',
     placeholder: '16',
     description: freeTextDescription,
+    step: 1,
+    inputMode: 'numeric',
     group: 'Осмотр и лечение',
   },
   {
@@ -287,6 +293,7 @@ export const visitFieldConfigs: FieldConfig[] = [
     title: 'ВПЧ логарифм',
     placeholder: '3.2',
     description: freeTextDescription,
+    step: 0.1,
     inputMode: 'decimal',
     group: 'Осмотр и лечение',
   },
@@ -310,7 +317,7 @@ export const visitFieldConfigs: FieldConfig[] = [
   },
   {
     key: 'vitaminD',
-    title: 'Вит Д',
+    title: 'Витамин Д',
     options: yesNoLowerCase,
     group: 'Осмотр и лечение',
   },

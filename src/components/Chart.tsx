@@ -31,7 +31,9 @@ const chartColors = [
 ]
 
 function scrollToVisit(visitNumber: number) {
-  const element = document.getElementById(`visit-${visitNumber}`)
+  const element =
+    document.getElementById(`visit-hpv-${visitNumber}`) ||
+    document.getElementById(`visit-${visitNumber}`)
   if (!element) return
 
   element.scrollIntoView({ behavior: 'smooth', block: 'start' })

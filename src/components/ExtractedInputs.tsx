@@ -10,6 +10,8 @@ import { useMemo, useState } from 'preact/hooks'
 import ButtonTypes from 'types/Button'
 import type { FieldState, Patient, PlainValue, Visit } from 'types/Patient'
 
+const MAX_HPV_TYPES = 5
+
 interface ExtractedInputsProps {
   patient: Patient
   onPassportChange: (fieldKey: string, value: PlainValue) => void
@@ -61,6 +63,19 @@ function serializeHpvPairRows(rows: HpvPairRow[]) {
   }
 }
 
+function normalizeNonNegativeIntegerValue(value: string) {
+  return value.replace(/\D+/g, '')
+}
+
+function normalizeNonNegativeDecimalValue(value: string) {
+  const normalized = value.replace(',', '.').replace(/[^0-9.]/g, '')
+  const [integerPart = '', ...rest] = normalized.split('.')
+
+  return rest.length > 0
+    ? `${integerPart}.${rest.join('')}`.replace(/\.+$/, '')
+    : integerPart
+}
+
 function normalizeValue(
   field: FieldState,
   value: string,
@@ -97,9 +112,7 @@ function ProcessedInput({
           <input
             key={`${field.key}-${index}`}
             className="placeholder:text-opacity-30 placeholder:text-slate-500 input input-bordered"
-            placeholder={
-              index === 0 ? field.placeholder || '---' : 'Что-то еще'
-            }
+            placeholder={index === 0 ? field.placeholder || '---' : '...'}
             value={itemValue}
             onInput={(e) => {
               const nextValues = [...inputValues]
@@ -212,11 +225,13 @@ function FieldControl({
 }
 
 function HpvPairControl({
+  visitNumber,
   typeField,
   logField,
   onTypeChange,
   onLogChange,
 }: {
+  visitNumber: number
   typeField: FieldState
   logField: FieldState
   onTypeChange: (value: PlainValue) => void
@@ -224,13 +239,15 @@ function HpvPairControl({
 }) {
   const typeValues = splitCommaSeparatedValues(typeField.value)
   const logValues = splitCommaSeparatedValues(logField.value, true)
-  const rows: HpvPairRow[] = Array.from(
-    { length: Math.max(typeValues.length, 1) + 1 },
-    (_, index) => ({
-      type: typeValues[index] || '',
-      log: logValues[index] || '',
-    })
-  )
+  const filledRowsCount = Math.max(typeValues.length, 1)
+  const rowsCount =
+    typeValues.length >= MAX_HPV_TYPES
+      ? filledRowsCount
+      : Math.min(filledRowsCount + 1, MAX_HPV_TYPES)
+  const rows: HpvPairRow[] = Array.from({ length: rowsCount }, (_, index) => ({
+    type: typeValues[index] || '',
+    log: logValues[index] || '',
+  }))
 
   const updateRows = (
     index: number,
@@ -247,14 +264,17 @@ function HpvPairControl({
   }
 
   return (
-    <div className="form-control my-3 w-full gap-2">
+    <div
+      id={`visit-hpv-${visitNumber}`}
+      className="form-control my-3 w-full scroll-mt-28 gap-2"
+    >
       <div className="flex flex-col gap-0.5">
         <b>
           {formatFieldLabel(typeField.title)} /{' '}
           {formatFieldLabel(logField.title)}
         </b>
         <span className="text-xs opacity-70">
-          Для каждого ВПЧ типа укажите свой логарифм.
+          Для каждого ВПЧ типа укажите свой логарифм. Максимум 5 типов.
         </span>
       </div>
 
@@ -266,12 +286,19 @@ function HpvPairControl({
           >
             <input
               className="input input-bordered placeholder:text-opacity-30 placeholder:text-slate-500"
-              placeholder={
-                index === 0 ? typeField.placeholder || '---' : 'Что-то еще'
-              }
+              placeholder={index === 0 ? typeField.placeholder || '---' : '...'}
               value={row.type}
-              onInput={(e) => updateRows(index, 'type', e.currentTarget.value)}
-              type="text"
+              onInput={(e) =>
+                updateRows(
+                  index,
+                  'type',
+                  normalizeNonNegativeIntegerValue(e.currentTarget.value)
+                )
+              }
+              type="number"
+              min={0}
+              step={typeField.step}
+              inputMode={typeField.inputMode}
             />
             <input
               className="input input-bordered placeholder:text-opacity-30 placeholder:text-slate-500"
@@ -279,8 +306,16 @@ function HpvPairControl({
                 index === 0 ? logField.placeholder || '---' : 'Логарифм'
               }
               value={row.log}
-              onInput={(e) => updateRows(index, 'log', e.currentTarget.value)}
-              type="text"
+              onInput={(e) =>
+                updateRows(
+                  index,
+                  'log',
+                  normalizeNonNegativeDecimalValue(e.currentTarget.value)
+                )
+              }
+              type="number"
+              min={0}
+              step={logField.step}
               inputMode={logField.inputMode}
             />
           </div>
@@ -292,7 +327,8 @@ function HpvPairControl({
 
 function renderGroupedFields(
   fields: FieldState[],
-  onChange: (fieldKey: string, value: PlainValue) => void
+  onChange: (fieldKey: string, value: PlainValue) => void,
+  visitNumber?: number
 ) {
   const groups = fields.reduce<Record<string, FieldState[]>>((acc, field) => {
     const groupName = field.group || 'Общее'
@@ -317,6 +353,7 @@ function renderGroupedFields(
             return (
               <HpvPairControl
                 key={field.key}
+                visitNumber={visitNumber || 1}
                 typeField={field}
                 logField={logField}
                 onTypeChange={(value) => onChange(field.key, value)}
@@ -442,8 +479,10 @@ function VisitEditor({
             field={visit.interval}
             onChange={(value) => onVisitIntervalChange(visit.id, value)}
           />
-          {renderGroupedFields(visit.fields, (fieldKey, value) =>
-            onVisitFieldChange(visit.id, fieldKey, value)
+          {renderGroupedFields(
+            visit.fields,
+            (fieldKey, value) => onVisitFieldChange(visit.id, fieldKey, value),
+            visit.visitNumber
           )}
         </div>
       )}

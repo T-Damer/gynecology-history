@@ -3,6 +3,7 @@ import {
   visitFieldConfigs,
   visitIntervalConfig,
 } from 'config/formSchema'
+import { getTodayIso } from 'helpers/patientDerived'
 import { v4 } from 'uuid'
 
 export type InputType = 'number' | 'date' | 'string' | 'textarea'
@@ -50,20 +51,23 @@ export interface Patient {
   visits: Visit[]
 }
 
-function cloneField(config: FieldConfig): FieldState {
-  return { ...config, value: undefined }
+function cloneField(config: FieldConfig, value?: PlainValue): FieldState {
+  return { ...config, value }
 }
 
 export function createVisit(visitNumber: number): Visit {
   return {
     id: v4(),
     visitNumber,
-    visitDate: cloneField({
-      key: 'visitDate',
-      title: 'Дата визита',
-      type: 'date',
-      required: true,
-    }),
+    visitDate: cloneField(
+      {
+        key: 'visitDate',
+        title: 'Дата визита',
+        type: 'date',
+        required: true,
+      },
+      getTodayIso()
+    ),
     interval: cloneField(visitIntervalConfig),
     fields: visitFieldConfigs.map(cloneField),
   }

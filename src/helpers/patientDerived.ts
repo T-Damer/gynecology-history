@@ -39,6 +39,10 @@ export function getBirthDateMaxIso() {
   return formatDateAsIso(maxBirthDate)
 }
 
+export function getTodayIso() {
+  return formatDateAsIso(new Date())
+}
+
 export function isAllowedBirthDate(value: string | number | undefined) {
   if (typeof value !== 'string' || !value) return false
 
