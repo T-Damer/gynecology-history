@@ -3,7 +3,7 @@ import type { FieldConfig } from 'types/Patient'
 const numberFieldDescription = 'Числовое поле без верхнего ограничения.'
 const freeTextDescription = 'Свободный ввод.'
 const multiValueDescription =
-  'Если нужно, перечислите несколько значений через запятую.'
+  'Если нужно ввести несколько значений, вводите их в следующее поле.'
 
 const yearsOptions = ['впервые выявлен', '1', '2', '3', '4', '5', 'более 5 лет']
 
