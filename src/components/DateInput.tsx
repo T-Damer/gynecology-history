@@ -3,15 +3,25 @@ import CalendarIcon from 'components/Icons/CalendarIcon'
 import { OnChange } from 'types/FormEvent'
 
 const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
-const monthFormatter = new Intl.DateTimeFormat('ru-RU', {
-  month: 'long',
-  year: 'numeric',
-})
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
   day: '2-digit',
   month: 'long',
   year: 'numeric',
 })
+const monthNames = [
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
+]
 
 function isMobileDevice() {
   if (typeof window === 'undefined') return true
@@ -45,12 +55,34 @@ function parseIsoDate(value: string | number | undefined) {
   return parsedDate
 }
 
+function getInitialDisplayMonth(
+  value: string | number | undefined,
+  min?: string,
+  max?: string
+) {
+  return (
+    parseIsoDate(value) ||
+    parseIsoDate(max) ||
+    parseIsoDate(min) ||
+    startOfMonth(new Date())
+  )
+}
+
 function startOfMonth(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), 1)
 }
 
-function addMonths(date: Date, diff: number) {
-  return new Date(date.getFullYear(), date.getMonth() + diff, 1)
+function getYearOptions(selectedDate: Date | null, min?: string, max?: string) {
+  const currentYear = new Date().getFullYear()
+  const minDate = parseIsoDate(min)
+  const maxDate = parseIsoDate(max)
+  const startYear = minDate?.getFullYear() || 1900
+  const endYear = maxDate?.getFullYear() || Math.max(currentYear + 10, selectedDate?.getFullYear() || currentYear)
+  const years: number[] = []
+
+  for (let year = startYear; year <= endYear; year += 1) years.push(year)
+
+  return years
 }
 
 function buildCalendarDays(displayMonth: Date) {
@@ -98,13 +130,12 @@ export default function ({
   const [useNativePicker] = useState(() => isMobileDevice())
   const [isOpen, setIsOpen] = useState(false)
   const [displayMonth, setDisplayMonth] = useState<Date>(
-    () => selectedDate || startOfMonth(new Date())
+    () => startOfMonth(getInitialDisplayMonth(value, min, max))
   )
 
   useEffect(() => {
-    if (!selectedDate) return
-    setDisplayMonth(startOfMonth(selectedDate))
-  }, [value])
+    setDisplayMonth(startOfMonth(getInitialDisplayMonth(value, min, max)))
+  }, [max, min, value])
 
   useEffect(() => {
     if (!isOpen || useNativePicker) return
@@ -132,6 +163,10 @@ export default function ({
     [displayMonth]
   )
   const selectedIso = typeof value === 'string' ? value : ''
+  const yearOptions = useMemo(
+    () => getYearOptions(selectedDate, min, max),
+    [selectedDate, min, max]
+  )
 
   if (useNativePicker)
     return (
@@ -167,22 +202,42 @@ export default function ({
 
       {isOpen ? (
         <div className="absolute left-0 top-[calc(100%+0.5rem)] z-30 w-[19rem] rounded-box border border-base-300 bg-base-100 p-3 shadow-xl">
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => setDisplayMonth((prev) => addMonths(prev, -1))}
+          <div className="mb-3 flex items-center gap-2">
+            <select
+              className="select select-bordered select-sm flex-1"
+              value={String(displayMonth.getMonth())}
+              onInput={(e) =>
+                setDisplayMonth(
+                  new Date(
+                    displayMonth.getFullYear(),
+                    Number(e.currentTarget.value),
+                    1
+                  )
+                )
+              }
             >
-              ←
-            </button>
-            <strong className="capitalize">{monthFormatter.format(displayMonth)}</strong>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => setDisplayMonth((prev) => addMonths(prev, 1))}
+              {monthNames.map((monthName, index) => (
+                <option key={monthName} value={index}>
+                  {monthName}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="select select-bordered select-sm w-28"
+              value={String(displayMonth.getFullYear())}
+              onInput={(e) =>
+                setDisplayMonth(
+                  new Date(Number(e.currentTarget.value), displayMonth.getMonth(), 1)
+                )
+              }
             >
-              →
-            </button>
+              {yearOptions.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mb-2 grid grid-cols-7 gap-1 text-center text-xs opacity-60">
@@ -224,9 +279,11 @@ export default function ({
             <button
               type="button"
               className="btn btn-ghost btn-sm"
-              onClick={() => setDisplayMonth(startOfMonth(new Date()))}
+              onClick={() =>
+                setDisplayMonth(startOfMonth(getInitialDisplayMonth(value, min, max)))
+              }
             >
-              Сегодня
+              К началу
             </button>
 
             <div className="flex gap-2">
