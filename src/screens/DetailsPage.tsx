@@ -6,6 +6,7 @@ import ExtractedInputs from 'components/ExtractedInputs'
 import ArrowUp from 'components/Icons/ArrowUp'
 import Save from 'components/Icons/Save'
 import NotFound from 'components/NotFound'
+import StatusTimelineChart from 'components/StatusTimelineChart'
 import goMain from 'helpers/goMain'
 import handleError from 'helpers/handleError'
 import {
@@ -340,6 +341,19 @@ export default function ({ id }: { id: string }) {
       })),
     [currentPatient.visits]
   )
+  const statusChartVisits = useMemo(
+    () =>
+      currentPatient.visits.map((visit) => ({
+        visitNumber: visit.visitNumber,
+        visitDate:
+          typeof visit.visitDate.value === 'string'
+            ? visit.visitDate.value
+            : undefined,
+        cytology: getFieldValue(visit.fields, 'cytology'),
+        colposcopy: getFieldValue(visit.fields, 'colposcopy'),
+      })),
+    [currentPatient.visits]
+  )
 
   const saveAndExport = useCallback(() => {
     const missingVisitDate = currentPatient.visits.find(
@@ -381,6 +395,7 @@ export default function ({ id }: { id: string }) {
       />
 
       <Chart visits={chartVisits} />
+      <StatusTimelineChart visits={statusChartVisits} />
 
       <div className="flex flex-row w-full gap-x-2 bottom-safe-bottom z-20 print:hidden drop-shadow-md">
         <Button

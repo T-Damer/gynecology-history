@@ -9,6 +9,25 @@ const yearsOptions = ['впервые выявлен', '1', '2', '3', '4', '5', 
 
 const yesNoCapitalized = ['Да', 'Нет']
 const yesNoLowerCase = ['да', 'нет']
+export const colposcopyOptions = [
+  'Норма',
+  'АКС1',
+  'АКС2',
+  'ДКС',
+  'НКП АКС',
+  'Подозрение на инвазию',
+  'Рак',
+]
+export const cytologyOptions = [
+  'Норма',
+  'ASCUS',
+  'LSIL',
+  'HSIL',
+  'AGC',
+  'AIS',
+  'ПКР',
+  'Аденокарцинома',
+]
 
 export const passportFieldConfigs: FieldConfig[] = [
   {
@@ -241,30 +260,13 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'colposcopy',
     title: 'Кольпоскопия',
-    options: [
-      'Норма',
-      'АКС1',
-      'АКС2',
-      'ДКС',
-      'НКП АКС',
-      'Подозрение на инвазию',
-      'Рак',
-    ],
+    options: colposcopyOptions,
     group: 'Осмотр и лечение',
   },
   {
     key: 'cytology',
     title: 'Цитология',
-    options: [
-      'Норма',
-      'ASCUS',
-      'LSIL',
-      'HSIL',
-      'AGC',
-      'AIS',
-      'ПКР',
-      'Аденокарцинома',
-    ],
+    options: cytologyOptions,
     group: 'Осмотр и лечение',
   },
   {
