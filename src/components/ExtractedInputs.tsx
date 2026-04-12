@@ -136,7 +136,7 @@ function renderGroupedFields(
 
   return Object.entries(groups).map(([groupName, groupFields]) => (
     <div key={groupName} className="mt-4 first:mt-0">
-      <h4 className="sticky top-36 z-10 -mx-4 mb-2 border-b border-base-300 bg-base-100/95 px-4 py-2 text-sm uppercase tracking-wide opacity-80 backdrop-blur sm:top-40">
+      <h4 className="sticky top-32 z-10 -mx-4 mb-2 border-b border-base-300 bg-base-100/95 px-4 py-2 text-sm uppercase tracking-wide opacity-80 backdrop-blur">
         {formatFieldLabel(groupName)}
       </h4>
       {groupFields.map((field) => (
@@ -201,7 +201,7 @@ function VisitEditor({
 
   return (
     <section className="rounded-box border-2 border-neutral-content p-4">
-      <div className="sticky top-20 z-20 -mx-4 mb-3 border-b border-base-300 bg-base-100/95 px-4 py-3 backdrop-blur sm:top-24">
+      <div className="sticky top-[4.5rem] z-20 -mx-4 mb-3 border-b border-base-300 bg-base-100/95 px-4 py-3 backdrop-blur">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
@@ -211,17 +211,17 @@ function VisitEditor({
             {title} {collapsed ? '+' : '-'}
           </button>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-nowrap gap-2 self-start sm:self-auto">
             <Button
               buttonType={ButtonTypes.ghost}
-              className="btn-sm"
+              className="btn-sm whitespace-nowrap"
               onClick={() => onCopyVisit(visit.id)}
             >
               Дублировать
             </Button>
             <Button
               buttonType={ButtonTypes.error}
-              className="btn-sm"
+              className="btn-sm whitespace-nowrap"
               onClick={() => onDeleteVisit(visit.id)}
               disabled={visitsCount === 1}
             >
