@@ -261,7 +261,7 @@ export default function ({
     <div className="flex flex-col gap-4">
       <PassportSection fields={patient.passport} onChange={onPassportChange} />
 
-      <section className="relative rounded-box border-2 border-neutral-content p-4">
+      <section className="relative">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold">Визиты</h2>
