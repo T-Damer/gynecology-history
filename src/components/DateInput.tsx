@@ -83,10 +83,14 @@ export default function ({
   value,
   onChange,
   required,
+  min,
+  max,
 }: {
   value: string | number | undefined
   onChange: OnChange
   required: boolean | undefined
+  min?: string
+  max?: string
 }) {
   const dateInputRef = useRef<HTMLInputElement | null>(null)
   const popoverRef = useRef<HTMLDivElement | null>(null)
@@ -139,6 +143,8 @@ export default function ({
           type="date"
           ref={dateInputRef}
           required={required}
+          min={min}
+          max={max}
         />
         <CalendarIcon onPress={() => dateInputRef.current?.showPicker()} />
       </label>
@@ -189,6 +195,7 @@ export default function ({
             {calendarDays.map(({ date, iso, isCurrentMonth }) => {
               const isSelected = iso === selectedIso
               const isToday = iso === formatIsoDate(new Date())
+              const isDisabled = Boolean((min && iso < min) || (max && iso > max))
 
               return (
                 <button
@@ -200,7 +207,8 @@ export default function ({
                       : 'btn-ghost'
                   } ${isCurrentMonth ? '' : 'opacity-40'} ${
                     isToday && !isSelected ? 'border border-primary' : ''
-                  }`}
+                  } ${isDisabled ? 'btn-disabled pointer-events-none opacity-30' : ''}`}
+                  disabled={isDisabled}
                   onClick={() => {
                     emitDateChange(onChange, iso)
                     setIsOpen(false)

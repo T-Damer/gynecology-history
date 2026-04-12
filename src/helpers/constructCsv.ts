@@ -10,12 +10,14 @@ export default function (patient: Patient) {
   const passportFields = getResolvedPassportFields(patient.passport)
   const titles = [
     ...passportFields.map((field) => field.title),
+    patient.visits[0]?.visitDate.title || 'Дата визита',
     patient.visits[0]?.interval.title || 'Явка',
     ...patient.visits[0]?.fields.map((field) => field.title),
   ]
 
   const rows = patient.visits.map((visit) => [
     ...passportFields.map((field) => toCellValue(field.value)),
+    toCellValue(visit.visitDate.value),
     toCellValue(visit.interval.value),
     ...visit.fields.map((field) => toCellValue(field.value)),
   ])

@@ -5,6 +5,7 @@ import ButtonTypes from 'types/Button'
 import DateInput from 'components/DateInput'
 import {
   formatFieldLabel,
+  getBirthDateMaxIso,
   getResolvedPassportFields,
 } from 'helpers/patientDerived'
 import { FieldState, Patient, PlainValue, Visit } from 'types/Patient'
@@ -17,6 +18,7 @@ interface ExtractedInputsProps {
     fieldKey: string,
     value: PlainValue
   ) => void
+  onVisitDateChange: (visitId: string, value: PlainValue) => void
   onVisitIntervalChange: (visitId: string, value: PlainValue) => void
   onAddVisit: () => void
   onCopyVisit: (visitId: string) => void
@@ -38,6 +40,8 @@ function ProcessedInput({
   field: FieldState
   onChange: (value: PlainValue) => void
 }) {
+  const max = field.key === 'birthDate' ? getBirthDateMaxIso() : undefined
+
   if (field.options?.length)
     return (
       <select
@@ -63,6 +67,7 @@ function ProcessedInput({
       <DateInput
         value={field.value}
         required={field.required}
+        {...(max ? { max } : {})}
         onChange={({ currentTarget }) => onChange(currentTarget.value || undefined)}
       />
     )
@@ -180,6 +185,7 @@ function VisitEditor({
   visit,
   visitsCount,
   onVisitFieldChange,
+  onVisitDateChange,
   onVisitIntervalChange,
   onCopyVisit,
   onDeleteVisit,
@@ -191,6 +197,7 @@ function VisitEditor({
     fieldKey: string,
     value: PlainValue
   ) => void
+  onVisitDateChange: (visitId: string, value: PlainValue) => void
   onVisitIntervalChange: (visitId: string, value: PlainValue) => void
   onCopyVisit: (visitId: string) => void
   onDeleteVisit: (visitId: string) => void
@@ -234,6 +241,10 @@ function VisitEditor({
       {collapsed ? null : (
         <div ref={parentRef} className="mt-3">
           <FieldControl
+            field={visit.visitDate}
+            onChange={(value) => onVisitDateChange(visit.id, value)}
+          />
+          <FieldControl
             field={visit.interval}
             onChange={(value) => onVisitIntervalChange(visit.id, value)}
           />
@@ -250,6 +261,7 @@ export default function ({
   patient,
   onPassportChange,
   onVisitFieldChange,
+  onVisitDateChange,
   onVisitIntervalChange,
   onAddVisit,
   onCopyVisit,
@@ -282,6 +294,7 @@ export default function ({
               visit={visit}
               visitsCount={patient.visits.length}
               onVisitFieldChange={onVisitFieldChange}
+              onVisitDateChange={onVisitDateChange}
               onVisitIntervalChange={onVisitIntervalChange}
               onCopyVisit={onCopyVisit}
               onDeleteVisit={onDeleteVisit}

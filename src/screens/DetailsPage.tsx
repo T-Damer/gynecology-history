@@ -15,6 +15,7 @@ import scrollTop from 'helpers/scrollTop'
 import {
   calculateAgeFromBirthDate,
   formatFieldLabel,
+  isAllowedBirthDate,
 } from 'helpers/patientDerived'
 import {
   createVisit,
@@ -91,6 +92,12 @@ export default function ({ id }: { id: string }) {
           return patient
         }
 
+        if (fieldKey === 'birthDate' && value && !isAllowedBirthDate(value)) {
+          const error = 'Минимальный возраст пациента — 12 лет'
+          handleError({ e: error, toastMessage: error })
+          return patient
+        }
+
         return {
           ...patient,
           passport: patient.passport.map((field) =>
@@ -123,6 +130,39 @@ export default function ({ id }: { id: string }) {
             : visit
         ),
       }))
+    },
+    [setCurrentPatient]
+  )
+
+  const onVisitDateChange = useCallback(
+    (visitId: string, value: PlainValue) => {
+      setCurrentPatient((patient) => {
+        const targetVisit = patient.visits.find((visit) => visit.id === visitId)
+        if (!targetVisit) return patient
+
+        const isEmptyRequiredValue =
+          targetVisit.visitDate.required &&
+          (value === undefined ||
+            (typeof value === 'string' && value.trim().length === 0))
+
+        if (isEmptyRequiredValue) {
+          const error = `Поле "${formatFieldLabel(targetVisit.visitDate.title)}" обязательно`
+          handleError({ e: error, toastMessage: error })
+          return patient
+        }
+
+        return {
+          ...patient,
+          visits: patient.visits.map((visit) =>
+            visit.id === visitId
+              ? {
+                  ...visit,
+                  visitDate: { ...visit.visitDate, value },
+                }
+              : visit
+          ),
+        }
+      })
     },
     [setCurrentPatient]
   )
@@ -160,6 +200,7 @@ export default function ({ id }: { id: string }) {
         const visitToCopy = patient.visits[visitIndex]
         const duplicatedVisit: Visit = {
           ...createVisit(visitToCopy.visitNumber + 1),
+          visitDate: { ...visitToCopy.visitDate },
           interval: { ...visitToCopy.interval },
           fields: visitToCopy.fields.map((field) => ({ ...field })),
         }
@@ -215,6 +256,22 @@ export default function ({ id }: { id: string }) {
   const fileName = safeFileName(displayName)
 
   const saveAndExport = useCallback(() => {
+    const missingVisitDate = currentPatient.visits.find(
+      (visit) =>
+        visit.visitDate.required &&
+        (!visit.visitDate.value ||
+          (typeof visit.visitDate.value === 'string' &&
+            visit.visitDate.value.trim().length === 0))
+    )
+
+    if (missingVisitDate) {
+      const error = `Укажите ${formatFieldLabel(
+        missingVisitDate.visitDate.title
+      )} для визита ${missingVisitDate.visitNumber}`
+      handleError({ e: error, toastMessage: error })
+      return
+    }
+
     saveObjectAsXlsx(fileName, currentPatient)
   }, [currentPatient, fileName])
 
@@ -230,6 +287,7 @@ export default function ({ id }: { id: string }) {
         patient={currentPatient}
         onPassportChange={onPassportChange}
         onVisitFieldChange={onVisitFieldChange}
+        onVisitDateChange={onVisitDateChange}
         onVisitIntervalChange={onVisitIntervalChange}
         onAddVisit={onAddVisit}
         onCopyVisit={onCopyVisit}

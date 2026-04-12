@@ -28,6 +28,7 @@ export interface FieldState extends FieldConfig {
 export interface Visit {
   id: string
   visitNumber: number
+  visitDate: FieldState
   interval: FieldState
   fields: FieldState[]
 }
@@ -45,6 +46,12 @@ export function createVisit(visitNumber: number): Visit {
   return {
     id: v4(),
     visitNumber,
+    visitDate: cloneField({
+      key: 'visitDate',
+      title: 'Дата визита',
+      type: 'date',
+      required: true,
+    }),
     interval: cloneField(visitIntervalConfig),
     fields: visitFieldConfigs.map(cloneField),
   }
@@ -87,6 +94,7 @@ export function clonePatient(patient: Patient): Patient {
     visits: patient.visits.map((visit, index) => ({
       id: v4(),
       visitNumber: index + 1,
+      visitDate: { ...visit.visitDate },
       interval: { ...visit.interval },
       fields: visit.fields.map((field) => ({ ...field })),
     })),

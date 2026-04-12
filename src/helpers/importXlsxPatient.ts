@@ -61,6 +61,10 @@ export default async function (
 
     return {
       ...visit,
+      visitDate: {
+        ...visit.visitDate,
+        value: parseImportedValue(visit.visitDate, row[visit.visitDate.title]),
+      },
       interval: {
         ...visit.interval,
         value: parseImportedValue(visit.interval, row[visit.interval.title]),

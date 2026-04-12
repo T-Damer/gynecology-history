@@ -4,8 +4,10 @@ import { v4 } from 'uuid'
 import Button from 'components/Button'
 import ButtonTypes from 'types/Button'
 import Card from 'components/Card'
+import DateInput from 'components/DateInput'
 import { passportFieldConfigs } from 'config/formSchema'
 import handleError from 'helpers/handleError'
+import { getBirthDateMaxIso, isAllowedBirthDate } from 'helpers/patientDerived'
 import importXlsxPatient from 'helpers/importXlsxPatient'
 import patientsDataStore from 'atoms/patientsDataStore'
 import { createPatient } from 'types/Patient'
@@ -45,6 +47,12 @@ function AddPatientForm() {
       return
     }
 
+    if (!isAllowedBirthDate(draft.birthDate)) {
+      const error = 'Минимальный возраст пациента — 12 лет'
+      handleError({ e: error, toastMessage: error })
+      return
+    }
+
     setPatientsData((prevData) => ({
       ...prevData,
       [v4()]: createPatient({
@@ -74,13 +82,12 @@ function AddPatientForm() {
         }
       />
 
-      <input
-        type="date"
-        className="input input-bordered"
-        required={requiredPassportKeys.has('birthDate')}
+      <DateInput
         value={draft.birthDate || ''}
-        onInput={(e) =>
-          setDraft((prev) => ({ ...prev, birthDate: e.currentTarget.value }))
+        required={requiredPassportKeys.has('birthDate')}
+        max={getBirthDateMaxIso()}
+        onChange={({ currentTarget }) =>
+          setDraft((prev) => ({ ...prev, birthDate: currentTarget.value }))
         }
       />
 
