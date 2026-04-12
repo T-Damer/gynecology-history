@@ -1,10 +1,16 @@
-export default function ({ onPress }: { onPress: () => void }) {
+export default function ({
+  onPress,
+  className = '',
+}: {
+  onPress?: () => void
+  className?: string
+}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 200 200"
       fill="currentColor"
-      className="w-4 h-4 cursor-pointer"
+      className={`w-4 h-4 ${onPress ? 'cursor-pointer' : ''} ${className}`}
       onClick={onPress}
     >
       <path
