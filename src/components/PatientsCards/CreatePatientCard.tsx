@@ -73,25 +73,33 @@ function AddPatientForm() {
 
   return (
     <div className="flex flex-col gap-2 justify-center">
-      <input
-        type="text"
-        placeholder="ФИО *"
-        className="input input-bordered"
-        value={draft.fullName || ''}
-        required={requiredPassportKeys.has('fullName')}
-        onInput={(e) =>
-          setDraft((prev) => ({ ...prev, fullName: e.currentTarget.value }))
-        }
-      />
+      <h2 className="m-0 text-lg font-semibold">Создать пациента</h2>
 
-      <DateInput
-        value={draft.birthDate || ''}
-        required={requiredPassportKeys.has('birthDate')}
-        max={getBirthDateMaxIso()}
-        onChange={({ currentTarget }) =>
-          setDraft((prev) => ({ ...prev, birthDate: currentTarget.value }))
-        }
-      />
+      <div className="form-control w-full gap-1">
+        <span className="text-sm font-medium">Имя пациента</span>
+        <input
+          type="text"
+          placeholder="ФИО *"
+          className="input input-bordered"
+          value={draft.fullName || ''}
+          required={requiredPassportKeys.has('fullName')}
+          onInput={(e) =>
+            setDraft((prev) => ({ ...prev, fullName: e.currentTarget.value }))
+          }
+        />
+      </div>
+
+      <div className="form-control w-full gap-1">
+        <span className="text-sm font-medium">Дата рождения</span>
+        <DateInput
+          value={draft.birthDate || ''}
+          required={requiredPassportKeys.has('birthDate')}
+          max={getBirthDateMaxIso()}
+          onChange={({ currentTarget }) =>
+            setDraft((prev) => ({ ...prev, birthDate: currentTarget.value }))
+          }
+        />
+      </div>
 
       <div className="flex items-center gap-x-2 pr-1.5">
         <Button
@@ -144,6 +152,9 @@ function ImportPatient() {
           setParsedResult(newPatient)
         }}
       />
+      <p className="m-0 text-sm opacity-70">
+        Программа может обработать только файлы, созданные ей.
+      </p>
       <Button
         buttonType={ButtonTypes.success}
         onClick={onClick}
