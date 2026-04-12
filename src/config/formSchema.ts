@@ -242,7 +242,7 @@ export const visitFieldConfigs: FieldConfig[] = [
     key: 'colposcopy',
     title: 'Кольпоскопия',
     options: [
-      'норма',
+      'Норма',
       'АКС1',
       'АКС2',
       'ДКС',
