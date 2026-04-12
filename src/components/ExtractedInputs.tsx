@@ -209,16 +209,21 @@ function VisitEditor({
   return (
     <section className="rounded-box border-2 border-neutral-content p-4">
       <div className="sticky top-[4.5rem] z-20 -mx-4 mb-3 border-b border-base-300 bg-base-100/95 px-4 py-3 backdrop-blur">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <button
-            type="button"
-            className="text-left text-lg font-semibold hover:opacity-70"
-            onClick={() => setCollapsed((prev) => !prev)}
-          >
-            {title} {collapsed ? '+' : '-'}
-          </button>
+        <div className="flex items-center justify-between gap-3">
+          <div className="text-left text-lg font-semibold">{title}</div>
 
-          <div className="flex flex-nowrap gap-2 self-start sm:self-auto">
+          <Button
+            buttonType={ButtonTypes.ghost}
+            className="btn-sm min-w-10 px-0 text-lg font-bold"
+            onClick={() => setCollapsed((prev) => !prev)}
+            aria-label={collapsed ? `Развернуть ${title}` : `Свернуть ${title}`}
+          >
+            {collapsed ? '+' : '−'}
+          </Button>
+        </div>
+
+        <div className="mt-3 flex flex-nowrap gap-2">
+          <div className="flex flex-nowrap gap-2">
             <Button
               buttonType={ButtonTypes.ghost}
               className="btn-sm whitespace-nowrap"
