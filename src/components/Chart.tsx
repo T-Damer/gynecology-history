@@ -52,7 +52,12 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
     )
     .sort((left, right) => left.value[0] - right.value[0])
 
-  if (chartData.length < 2) return null
+  const isComplete = visits.every((visit) => {
+    const timestamp = toTimestamp(visit.visitDate)
+    const viralLoad = parseViralLoad(visit.viralLoad)
+
+    return timestamp !== null && viralLoad !== null
+  })
 
   return (
     <section className="rounded-box border-2 border-neutral-content p-4">
@@ -63,84 +68,90 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
         </p>
       </div>
 
-      <div
-        className="relative w-full min-h-72"
-        style={{
-          background:
-            'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
-          backgroundSize: '12px 12px',
-        }}
-      >
-        <EChart
-          className="h-72 w-full"
-          use={[GridComponent, TooltipComponent, LineChart, CanvasRenderer]}
-          renderer="canvas"
-          grid={{
-            left: 12,
-            right: 18,
-            top: 18,
-            bottom: 28,
-            containLabel: true,
+      {isComplete ? (
+        <div
+          className="relative w-full min-h-72"
+          style={{
+            background:
+              'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
+            backgroundSize: '12px 12px',
           }}
-          tooltip={{
-            trigger: 'axis',
-            valueFormatter: (value) =>
-              typeof value === 'number' ? value.toFixed(2) : String(value),
-            formatter: (params) => {
-              const point = Array.isArray(params) ? params[0] : params
-              const [timestamp, viralLoad] = point.value as [number, number]
+        >
+          <EChart
+            className="h-72 w-full"
+            use={[GridComponent, TooltipComponent, LineChart, CanvasRenderer]}
+            renderer="canvas"
+            grid={{
+              left: 12,
+              right: 18,
+              top: 40,
+              bottom: 28,
+              containLabel: true,
+            }}
+            tooltip={{
+              trigger: 'axis',
+              valueFormatter: (value) =>
+                typeof value === 'number' ? value.toFixed(2) : String(value),
+              formatter: (params) => {
+                const point = Array.isArray(params) ? params[0] : params
+                const [timestamp, viralLoad] = point.value as [number, number]
 
-              return [
-                `<strong>${point.seriesName}</strong>`,
-                formatVisitDate(timestamp),
-                `ВПЧ логарифм: ${viralLoad.toFixed(2)}`,
-              ].join('<br/>')
-            },
-          }}
-          xAxis={{
-            type: 'time',
-            axisLabel: {
-              color: 'currentColor',
-              formatter: (value: number) =>
-                new Intl.DateTimeFormat('ru-RU', {
-                  day: '2-digit',
-                  month: '2-digit',
-                }).format(value),
-            },
-            splitLine: { show: false },
-          }}
-          yAxis={{
-            type: 'value',
-            name: 'ВПЧ логарифм',
-            nameTextStyle: {
-              color: 'currentColor',
-            },
-            axisLabel: {
-              formatter: (value: number) => value.toFixed(1),
-            },
-          }}
-          series={[
-            {
-              name: 'Вирусная нагрузка',
-              type: 'line',
-              smooth: true,
-              symbol: 'circle',
-              symbolSize: 10,
-              data: chartData,
-              lineStyle: {
-                width: 4,
-                color: '#2b7fff',
+                return [
+                  `<strong>${point.seriesName}</strong>`,
+                  formatVisitDate(timestamp),
+                  `ВПЧ логарифм: ${viralLoad.toFixed(2)}`,
+                ].join('<br/>')
               },
-              itemStyle: {
-                color: '#2b7fff',
+            }}
+            xAxis={{
+              type: 'time',
+              axisLabel: {
+                color: 'currentColor',
+                formatter: (value: number) =>
+                  new Intl.DateTimeFormat('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                  }).format(value),
               },
-              areaStyle: {
-                color: 'rgba(43,127,255,0.12)',
+              splitLine: { show: false },
+            }}
+            yAxis={{
+              type: 'value',
+              name: 'ВПЧ логарифм',
+              nameTextStyle: {
+                color: 'currentColor',
               },
-            },
-          ]}
-        />
-      </div>
+              axisLabel: {
+                formatter: (value: number) => value.toFixed(1),
+              },
+            }}
+            series={[
+              {
+                name: 'Вирусная нагрузка',
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 10,
+                data: chartData,
+                lineStyle: {
+                  width: 4,
+                  color: '#2b7fff',
+                },
+                itemStyle: {
+                  color: '#2b7fff',
+                },
+                areaStyle: {
+                  color: 'rgba(43,127,255,0.12)',
+                },
+              },
+            ]}
+          />
+        </div>
+      ) : (
+        <div className="flex min-h-72 items-center justify-center rounded-box border border-dashed border-base-300 bg-base-200/30 px-6 text-center text-sm font-medium">
+          Заполнить дату визита и ВПЧ логарифм для каждого визита
+        </div>
+      )}
     </section>
   )
 }
