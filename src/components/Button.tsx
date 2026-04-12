@@ -1,4 +1,4 @@
-import ButtonTypes, { ButtonProps, buttonClassNames } from 'types/Button'
+import ButtonTypes, { type ButtonProps, buttonClassNames } from 'types/Button'
 
 export default function ({
   buttonType = ButtonTypes.primary,

@@ -1,17 +1,18 @@
-import { JSXInternal } from 'preact/src/jsx'
-import { read, utils } from 'xlsx'
+import type { JSXInternal } from 'preact/src/jsx'
 import {
+  type FieldState,
+  type Patient,
+  type PlainValue,
   createPatient,
   createVisit,
-  FieldState,
-  Patient,
-  PlainValue,
   reindexVisits,
 } from 'types/Patient'
+import { read, utils } from 'xlsx'
 import handleError from './handleError'
 
 function parseImportedValue(field: FieldState, rawValue: unknown): PlainValue {
-  if (rawValue === undefined || rawValue === null || rawValue === '') return undefined
+  if (rawValue === undefined || rawValue === null || rawValue === '')
+    return undefined
 
   const stringValue = String(rawValue)
 

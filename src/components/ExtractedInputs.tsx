@@ -1,14 +1,14 @@
 import { useAutoAnimate } from '@formkit/auto-animate/preact'
-import { useMemo, useState } from 'preact/hooks'
 import Button from 'components/Button'
-import ButtonTypes from 'types/Button'
 import DateInput from 'components/DateInput'
 import {
   formatFieldLabel,
   getBirthDateMaxIso,
   getResolvedPassportFields,
 } from 'helpers/patientDerived'
-import { FieldState, Patient, PlainValue, Visit } from 'types/Patient'
+import { useMemo, useState } from 'preact/hooks'
+import ButtonTypes from 'types/Button'
+import type { FieldState, Patient, PlainValue, Visit } from 'types/Patient'
 
 interface ExtractedInputsProps {
   patient: Patient
@@ -61,7 +61,9 @@ function ProcessedInput({
           <input
             key={`${field.key}-${index}`}
             className="placeholder:text-opacity-30 placeholder:text-slate-500 input input-bordered"
-            placeholder={index === 0 ? field.placeholder || '---' : 'Что-то еще'}
+            placeholder={
+              index === 0 ? field.placeholder || '---' : 'Что-то еще'
+            }
             value={itemValue}
             onInput={(e) => {
               const nextValues = [...inputValues]
@@ -158,7 +160,7 @@ function FieldControl({
   onChange: (value: PlainValue) => void
 }) {
   return (
-    <label className="form-control w-full my-3 gap-1">
+    <div className="form-control my-3 w-full gap-1">
       <div className="flex flex-col gap-0.5">
         <b>
           {formatFieldLabel(field.title)}
@@ -169,7 +171,7 @@ function FieldControl({
         ) : null}
       </div>
       <ProcessedInput field={field} onChange={onChange} />
-    </label>
+    </div>
   )
 }
 
@@ -329,7 +331,8 @@ export default function ({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold">
-              Визиты <span className="opacity-70">Всего {patient.visits.length}</span>
+              Визиты{' '}
+              <span className="opacity-70">Всего {patient.visits.length}</span>
             </h2>
             <p className="m-0 text-sm opacity-70">
               Все визиты используют общие паспортные данные пациента.

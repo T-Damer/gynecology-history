@@ -1,7 +1,7 @@
-import { CanvasRenderer } from 'echarts/renderers'
-import { GridComponent, TooltipComponent } from 'echarts/components'
-import { LineChart } from 'echarts/charts'
 import { EChart } from '@kbox-labs/react-echarts'
+import { LineChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
 
 interface VisitChartPoint {
   visitNumber: number
@@ -47,7 +47,9 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
         value: [timestamp, viralLoad],
       }
     })
-    .filter((point): point is { name: string; value: [number, number] } => Boolean(point))
+    .filter((point): point is { name: string; value: [number, number] } =>
+      Boolean(point)
+    )
     .sort((left, right) => left.value[0] - right.value[0])
 
   if (chartData.length < 2) return null

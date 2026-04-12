@@ -1,12 +1,12 @@
-import { ErrorBoundary } from 'react-error-boundary'
-import { Route, Router, Switch } from 'wouter-preact'
-import { ToastContainer } from 'react-toastify'
-import { useHashLocation } from 'wouter-preact/use-hash-location'
-import DetailsPage from 'screens/DetailsPage'
 import ErrorFallback from 'components/ErrorFallback'
 import Footer from 'components/Footer'
-import Main from 'screens/Main'
 import useTheme from 'hooks/useTheme'
+import { ErrorBoundary } from 'react-error-boundary'
+import { ToastContainer } from 'react-toastify'
+import DetailsPage from 'screens/DetailsPage'
+import Main from 'screens/Main'
+import { Route, Router, Switch } from 'wouter-preact'
+import { useHashLocation } from 'wouter-preact/use-hash-location'
 
 declare global {
   interface Window {

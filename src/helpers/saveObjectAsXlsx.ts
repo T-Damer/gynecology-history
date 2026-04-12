@@ -1,6 +1,6 @@
 import { saveAs } from 'file-saver'
-import { utils, WorkBook, write } from 'xlsx'
-import { Patient } from 'types/Patient'
+import type { Patient } from 'types/Patient'
+import { type WorkBook, utils, write } from 'xlsx'
 import constructCsv from './constructCsv'
 
 const fileExtension = '.xlsx'

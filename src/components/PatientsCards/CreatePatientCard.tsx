@@ -1,16 +1,16 @@
-import { useCallback, useMemo, useState } from 'preact/hooks'
-import { useSetAtom } from 'jotai'
-import { v4 } from 'uuid'
+import patientsDataStore from 'atoms/patientsDataStore'
 import Button from 'components/Button'
-import ButtonTypes from 'types/Button'
 import Card from 'components/Card'
 import DateInput from 'components/DateInput'
 import { passportFieldConfigs } from 'config/formSchema'
 import handleError from 'helpers/handleError'
-import { getBirthDateMaxIso, isAllowedBirthDate } from 'helpers/patientDerived'
 import importXlsxPatient from 'helpers/importXlsxPatient'
-import patientsDataStore from 'atoms/patientsDataStore'
+import { getBirthDateMaxIso, isAllowedBirthDate } from 'helpers/patientDerived'
+import { useSetAtom } from 'jotai'
+import { useCallback, useMemo, useState } from 'preact/hooks'
+import ButtonTypes from 'types/Button'
 import { createPatient } from 'types/Patient'
+import { v4 } from 'uuid'
 
 interface DraftPassport {
   fullName: string | undefined
@@ -23,7 +23,9 @@ const initialDraft: DraftPassport = {
 }
 
 const requiredPassportKeys = new Set(
-  passportFieldConfigs.filter((field) => field.required).map((field) => field.key)
+  passportFieldConfigs
+    .filter((field) => field.required)
+    .map((field) => field.key)
 )
 
 function AddPatientForm() {

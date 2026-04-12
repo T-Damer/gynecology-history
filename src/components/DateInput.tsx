@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import CalendarIcon from 'components/Icons/CalendarIcon'
-import { OnChange } from 'types/FormEvent'
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import type { OnChange } from 'types/FormEvent'
 
 const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
@@ -77,7 +77,9 @@ function getYearOptions(selectedDate: Date | null, min?: string, max?: string) {
   const minDate = parseIsoDate(min)
   const maxDate = parseIsoDate(max)
   const startYear = minDate?.getFullYear() || 1900
-  const endYear = maxDate?.getFullYear() || Math.max(currentYear + 10, selectedDate?.getFullYear() || currentYear)
+  const endYear =
+    maxDate?.getFullYear() ||
+    Math.max(currentYear + 10, selectedDate?.getFullYear() || currentYear)
   const years: number[] = []
 
   for (let year = startYear; year <= endYear; year += 1) years.push(year)
@@ -129,8 +131,8 @@ export default function ({
   const selectedDate = parseIsoDate(value)
   const [useNativePicker] = useState(() => isMobileDevice())
   const [isOpen, setIsOpen] = useState(false)
-  const [displayMonth, setDisplayMonth] = useState<Date>(
-    () => startOfMonth(getInitialDisplayMonth(value, min, max))
+  const [displayMonth, setDisplayMonth] = useState<Date>(() =>
+    startOfMonth(getInitialDisplayMonth(value, min, max))
   )
 
   useEffect(() => {
@@ -192,7 +194,9 @@ export default function ({
         className="input input-bordered flex w-full items-center gap-2 text-left"
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        <span className={`grow ${selectedDate ? '' : 'text-slate-500 opacity-70'}`}>
+        <span
+          className={`grow ${selectedDate ? '' : 'text-slate-500 opacity-70'}`}
+        >
           {selectedDate ? dateFormatter.format(selectedDate) : 'Выберите дату'}
         </span>
         <CalendarIcon className="pointer-events-none" />
@@ -228,7 +232,11 @@ export default function ({
               value={String(displayMonth.getFullYear())}
               onInput={(e) =>
                 setDisplayMonth(
-                  new Date(Number(e.currentTarget.value), displayMonth.getMonth(), 1)
+                  new Date(
+                    Number(e.currentTarget.value),
+                    displayMonth.getMonth(),
+                    1
+                  )
                 )
               }
             >
@@ -250,7 +258,9 @@ export default function ({
             {calendarDays.map(({ date, iso, isCurrentMonth }) => {
               const isSelected = iso === selectedIso
               const isToday = iso === formatIsoDate(new Date())
-              const isDisabled = Boolean((min && iso < min) || (max && iso > max))
+              const isDisabled = Boolean(
+                (min && iso < min) || (max && iso > max)
+              )
 
               return (
                 <button
@@ -280,7 +290,9 @@ export default function ({
               type="button"
               className="btn btn-ghost btn-sm"
               onClick={() =>
-                setDisplayMonth(startOfMonth(getInitialDisplayMonth(value, min, max)))
+                setDisplayMonth(
+                  startOfMonth(getInitialDisplayMonth(value, min, max))
+                )
               }
             >
               К началу

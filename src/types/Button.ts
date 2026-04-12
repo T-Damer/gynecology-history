@@ -1,12 +1,12 @@
-import { ComponentChildren } from 'preact'
-import { JSX } from 'preact/jsx-runtime'
+import type { ComponentChildren } from 'preact'
+import type { JSX } from 'preact/jsx-runtime'
 
 enum ButtonTypes {
-  success,
-  error,
-  primary,
-  outline,
-  ghost,
+  success = 0,
+  error = 1,
+  primary = 2,
+  outline = 3,
+  ghost = 4,
 }
 
 export interface ButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {

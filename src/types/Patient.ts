@@ -1,9 +1,9 @@
-import { v4 } from 'uuid'
 import {
   passportFieldConfigs,
   visitFieldConfigs,
   visitIntervalConfig,
 } from 'config/formSchema'
+import { v4 } from 'uuid'
 
 export type InputType = 'number' | 'date' | 'string' | 'textarea'
 export type PlainValue = number | string | undefined
@@ -20,7 +20,14 @@ export interface FieldConfig {
   group?: string
   required?: boolean
   readOnly?: boolean
-  inputMode?: 'text' | 'numeric' | 'decimal' | 'tel' | 'search' | 'email' | 'url'
+  inputMode?:
+    | 'text'
+    | 'numeric'
+    | 'decimal'
+    | 'tel'
+    | 'search'
+    | 'email'
+    | 'url'
   pattern?: string
   autoComplete?: string
   multiValue?: boolean

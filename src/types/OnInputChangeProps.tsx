@@ -1,4 +1,4 @@
-import { PlainValue } from 'types/Patient'
+import type { PlainValue } from 'types/Patient'
 
 export default interface OnInputChangeProps {
   value: PlainValue

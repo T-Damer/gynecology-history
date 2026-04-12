@@ -1,30 +1,30 @@
-import { useAtom } from 'jotai'
-import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
-import ArrowUp from 'components/Icons/ArrowUp'
-import Chart from 'components/Chart'
-import Save from 'components/Icons/Save'
+import patientsDataStore from 'atoms/patientsDataStore'
 import Button from 'components/Button'
-import ButtonTypes from 'types/Button'
+import Chart from 'components/Chart'
 import DetailsHeader from 'components/DetailsHeader'
 import ExtractedInputs from 'components/ExtractedInputs'
+import ArrowUp from 'components/Icons/ArrowUp'
+import Save from 'components/Icons/Save'
 import NotFound from 'components/NotFound'
-import patientsDataStore from 'atoms/patientsDataStore'
 import goMain from 'helpers/goMain'
 import handleError from 'helpers/handleError'
-import saveObjectAsXlsx from 'helpers/saveObjectAsXlsx'
-import scrollTop from 'helpers/scrollTop'
 import {
   calculateAgeFromBirthDate,
   formatFieldLabel,
   isAllowedBirthDate,
 } from 'helpers/patientDerived'
+import saveObjectAsXlsx from 'helpers/saveObjectAsXlsx'
+import scrollTop from 'helpers/scrollTop'
+import { useAtom } from 'jotai'
+import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
+import ButtonTypes from 'types/Button'
 import {
+  type Patient,
+  type PlainValue,
+  type Visit,
   createVisit,
   getFieldValue,
-  Patient,
-  PlainValue,
   reindexVisits,
-  Visit,
 } from 'types/Patient'
 
 function updatePatient(
@@ -332,7 +332,9 @@ export default function ({ id }: { id: string }) {
       currentPatient.visits.map((visit) => ({
         visitNumber: visit.visitNumber,
         visitDate:
-          typeof visit.visitDate.value === 'string' ? visit.visitDate.value : undefined,
+          typeof visit.visitDate.value === 'string'
+            ? visit.visitDate.value
+            : undefined,
         viralLoad: getFieldValue(visit.fields, 'hpvLog'),
       })),
     [currentPatient.visits]
@@ -379,7 +381,7 @@ export default function ({ id }: { id: string }) {
 
       <Chart visits={chartVisits} />
 
-      <div className="flex flex-row w-full gap-x-2 sticky bottom-safe-bottom z-20 print:hidden drop-shadow-md">
+      <div className="flex flex-row w-full gap-x-2 bottom-safe-bottom z-20 print:hidden drop-shadow-md">
         <Button
           buttonType={ButtonTypes.success}
           onClick={saveAndExport}

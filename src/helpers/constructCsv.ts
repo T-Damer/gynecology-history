@@ -1,4 +1,4 @@
-import { Patient } from 'types/Patient'
+import type { Patient } from 'types/Patient'
 import { getResolvedPassportFields } from './patientDerived'
 
 function toCellValue(value: string | number | undefined) {
@@ -12,7 +12,7 @@ export default function (patient: Patient) {
     ...passportFields.map((field) => field.title),
     patient.visits[0]?.visitDate.title || 'Дата визита',
     patient.visits[0]?.interval.title || 'Явка',
-    ...patient.visits[0]?.fields.map((field) => field.title),
+    ...(patient.visits[0]?.fields.map((field) => field.title) ?? []),
   ]
 
   const rows = patient.visits.map((visit) => [

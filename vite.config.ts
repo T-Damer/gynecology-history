@@ -1,8 +1,8 @@
-import { defineConfig, Plugin } from 'vite'
 import preact from '@preact/preset-vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { type Plugin, defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig(() => {
   return {

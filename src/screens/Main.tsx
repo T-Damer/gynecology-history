@@ -1,8 +1,8 @@
 import { useAutoAnimate } from '@formkit/auto-animate/preact'
-import { useState } from 'preact/hooks'
 import CreatePatientCard from 'components/PatientsCards/CreatePatientCard'
 import PatientCardList from 'components/PatientsCards/PatientCardList'
 import SearchBar from 'components/SearchBar'
+import { useState } from 'preact/hooks'
 
 export default function () {
   const [parentRef] = useAutoAnimate()

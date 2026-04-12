@@ -1,18 +1,11 @@
-import { FieldConfig } from 'types/Patient'
+import type { FieldConfig } from 'types/Patient'
 
 const numberFieldDescription = 'Числовое поле без верхнего ограничения.'
 const freeTextDescription = 'Свободный ввод.'
-const multiValueDescription = 'Если нужно, перечислите несколько значений через запятую.'
+const multiValueDescription =
+  'Если нужно, перечислите несколько значений через запятую.'
 
-const yearsOptions = [
-  'впервые выявлен',
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  'более 5 лет',
-]
+const yearsOptions = ['впервые выявлен', '1', '2', '3', '4', '5', 'более 5 лет']
 
 const yesNoCapitalized = ['Да', 'Нет']
 const yesNoLowerCase = ['да', 'нет']
@@ -81,7 +74,16 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'kpp',
     title: 'КПП',
-    options: ['1', '1а - тоже 1', '1б - не изв какая', '2', '3', '4', '5', 'более 5'],
+    options: [
+      '1',
+      '1а - тоже 1',
+      '1б - не изв какая',
+      '2',
+      '3',
+      '4',
+      '5',
+      'более 5',
+    ],
     group: 'Анамнез',
   },
   {
@@ -169,7 +171,16 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'cytologyChangesHistory',
     title: 'Изменения вцитологии',
-    options: ['Норма', 'ASCUS', 'LSIL', 'HSIL', 'AGC', 'AIS', 'ПКР', 'Аденокарцинома'],
+    options: [
+      'Норма',
+      'ASCUS',
+      'LSIL',
+      'HSIL',
+      'AGC',
+      'AIS',
+      'ПКР',
+      'Аденокарцинома',
+    ],
     group: 'Анамнез',
   },
   {
@@ -188,7 +199,14 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'epitheliumChanges',
     title: 'Изменения эпителия',
-    options: ['лейкоплакия', 'CIN I', 'CIN II', 'CIN III', 'ПКК рак', 'Аденокарцинома'],
+    options: [
+      'лейкоплакия',
+      'CIN I',
+      'CIN II',
+      'CIN III',
+      'ПКК рак',
+      'Аденокарцинома',
+    ],
     group: 'Анамнез',
   },
   {
@@ -219,13 +237,30 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'colposcopy',
     title: 'Кольпоскопия',
-    options: ['норма', 'АКС1', 'АКС2', 'ДКС', 'НКП АКС', 'Подозрение на инвазию', 'Рак'],
+    options: [
+      'норма',
+      'АКС1',
+      'АКС2',
+      'ДКС',
+      'НКП АКС',
+      'Подозрение на инвазию',
+      'Рак',
+    ],
     group: 'Осмотр и лечение',
   },
   {
     key: 'cytology',
     title: 'Цитология',
-    options: ['Норма', 'ASCUS', 'LSIL', 'HSIL', 'AGC', 'AIS', 'ПКР', 'Аденокарцинома'],
+    options: [
+      'Норма',
+      'ASCUS',
+      'LSIL',
+      'HSIL',
+      'AGC',
+      'AIS',
+      'ПКР',
+      'Аденокарцинома',
+    ],
     group: 'Осмотр и лечение',
   },
   {

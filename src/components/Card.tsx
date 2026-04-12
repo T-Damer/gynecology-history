@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'preact/compat'
+import type { PropsWithChildren } from 'preact/compat'
 
 interface CardProps extends PropsWithChildren {
   dashedOutline?: boolean

@@ -1,4 +1,4 @@
-import { ComponentChildren, JSX } from 'preact'
+import type { ComponentChildren, JSX } from 'preact'
 
 export type ClassName = JSX.HTMLAttributes<HTMLDivElement>['className']
 export type Style = JSX.HTMLAttributes<HTMLDivElement>['style']

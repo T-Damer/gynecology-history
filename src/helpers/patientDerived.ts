@@ -1,4 +1,4 @@
-import { FieldState } from 'types/Patient'
+import type { FieldState } from 'types/Patient'
 
 const MINIMUM_PATIENT_AGE = 12
 
@@ -46,7 +46,9 @@ export function isAllowedBirthDate(value: string | number | undefined) {
 }
 
 export function getResolvedPassportFields(fields: FieldState[]) {
-  const birthDateValue = fields.find((field) => field.key === 'birthDate')?.value
+  const birthDateValue = fields.find(
+    (field) => field.key === 'birthDate'
+  )?.value
   const age = calculateAgeFromBirthDate(birthDateValue)
 
   return fields.map((field) =>

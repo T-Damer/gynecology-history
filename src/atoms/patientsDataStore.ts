@@ -1,5 +1,5 @@
 import { atomWithStorage } from 'jotai/utils'
-import { Patient } from 'types/Patient'
+import type { Patient } from 'types/Patient'
 
 interface PatientsDataStore {
   [id: string]: Patient
