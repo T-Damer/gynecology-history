@@ -1,4 +1,5 @@
 import { Patient } from 'types/Patient'
+import { getResolvedPassportFields } from './patientDerived'
 
 function toCellValue(value: string | number | undefined) {
   if (value === undefined || value === null) return ''
@@ -6,14 +7,15 @@ function toCellValue(value: string | number | undefined) {
 }
 
 export default function (patient: Patient) {
+  const passportFields = getResolvedPassportFields(patient.passport)
   const titles = [
-    ...patient.passport.map((field) => field.title),
+    ...passportFields.map((field) => field.title),
     patient.visits[0]?.interval.title || 'Явка',
     ...patient.visits[0]?.fields.map((field) => field.title),
   ]
 
   const rows = patient.visits.map((visit) => [
-    ...patient.passport.map((field) => toCellValue(field.value)),
+    ...passportFields.map((field) => toCellValue(field.value)),
     toCellValue(visit.interval.value),
     ...visit.fields.map((field) => toCellValue(field.value)),
   ])

@@ -13,6 +13,10 @@ import handleError from 'helpers/handleError'
 import saveObjectAsXlsx from 'helpers/saveObjectAsXlsx'
 import scrollTop from 'helpers/scrollTop'
 import {
+  calculateAgeFromBirthDate,
+  formatFieldLabel,
+} from 'helpers/patientDerived'
+import {
   createVisit,
   getFieldValue,
   Patient,
@@ -82,7 +86,7 @@ export default function ({ id }: { id: string }) {
             (typeof value === 'string' && value.trim().length === 0))
 
         if (isEmptyRequiredValue) {
-          const error = `Поле "${targetField.title}" обязательно`
+          const error = `Поле "${formatFieldLabel(targetField.title)}" обязательно`
           handleError({ e: error, toastMessage: error })
           return patient
         }
@@ -198,7 +202,14 @@ export default function ({ id }: { id: string }) {
     String(getFieldValue(currentPatient.passport, 'fullName') || '').trim() ||
     'Без имени'
   const phone = String(getFieldValue(currentPatient.passport, 'phone') || '').trim()
-  const subtitle = [phone, `Визитов: ${currentPatient.visits.length}`]
+  const age = calculateAgeFromBirthDate(
+    getFieldValue(currentPatient.passport, 'birthDate')
+  )
+  const subtitle = [
+    age !== undefined ? `${age} лет` : undefined,
+    phone,
+    `Визитов: ${currentPatient.visits.length}`,
+  ]
     .filter(Boolean)
     .join(' · ')
   const fileName = safeFileName(displayName)

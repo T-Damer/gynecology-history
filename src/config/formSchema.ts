@@ -34,7 +34,8 @@ export const passportFieldConfigs: FieldConfig[] = [
     key: 'age',
     title: 'Возраст',
     type: 'number',
-    description: numberFieldDescription,
+    description: 'Рассчитывается автоматически по дате рождения.',
+    readOnly: true,
   },
   {
     key: 'phone',

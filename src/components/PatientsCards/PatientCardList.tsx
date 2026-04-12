@@ -2,6 +2,7 @@ import { useAtomValue } from 'jotai'
 import PatientCard from 'components/PatientsCards/PatientCard'
 import patientsDataStore from 'atoms/patientsDataStore'
 import { getFieldValue } from 'types/Patient'
+import { calculateAgeFromBirthDate } from 'helpers/patientDerived'
 
 function matchesSearch(search: string, values: Array<string | number | undefined>) {
   const query = search.toLowerCase().trim()
@@ -25,6 +26,7 @@ export default function ({ search }: { search?: string }) {
         'Без имени'
       const birthDate = String(getFieldValue(patient.passport, 'birthDate') || '')
       const phone = String(getFieldValue(patient.passport, 'phone') || '')
+      const age = calculateAgeFromBirthDate(birthDate || undefined)
 
       if (!matchesSearch(search || '', [displayName, birthDate, phone]))
         return null
@@ -35,6 +37,7 @@ export default function ({ search }: { search?: string }) {
           displayName={displayName}
           birthDate={birthDate || undefined}
           phone={phone || undefined}
+          age={age}
           visitsCount={patient.visits.length}
           key={index}
         />

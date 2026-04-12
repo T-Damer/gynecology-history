@@ -14,12 +14,14 @@ export default function ({
   displayName,
   birthDate,
   phone,
+  age,
   visitsCount,
 }: {
   id: string
   displayName: string
   birthDate: string | undefined
   phone: string | undefined
+  age: number | undefined
   visitsCount: number
 }) {
   const [patients, setPatients] = useAtom(patientsDataStore)
@@ -51,6 +53,9 @@ export default function ({
         <div className="flex-1 flex flex-col gap-1" onClick={onPress}>
           <span className="font-bold truncate-2 leading-snug">{displayName}</span>
           {birthDate ? <span className="text-sm opacity-70">{birthDate}</span> : null}
+          {age !== undefined ? (
+            <span className="text-sm opacity-70">Возраст: {age}</span>
+          ) : null}
           {phone ? <span className="text-sm opacity-70">{phone}</span> : null}
           <span className="text-sm opacity-70">Визитов: {visitsCount}</span>
         </div>

@@ -3,6 +3,10 @@ import { useMemo, useState } from 'preact/hooks'
 import Button from 'components/Button'
 import ButtonTypes from 'types/Button'
 import DateInput from 'components/DateInput'
+import {
+  formatFieldLabel,
+  getResolvedPassportFields,
+} from 'helpers/patientDerived'
 import { FieldState, Patient, PlainValue, Visit } from 'types/Patient'
 
 interface ExtractedInputsProps {
@@ -70,6 +74,7 @@ function ProcessedInput({
         placeholder={field.placeholder || '---'}
         value={String(field.value || '')}
         required={field.required}
+        readOnly={field.readOnly}
         onInput={(e) => onChange(e.currentTarget.value || undefined)}
       />
     )
@@ -91,6 +96,7 @@ function ProcessedInput({
       type={field.type || 'text'}
       step={field.step}
       required={field.required}
+      readOnly={field.readOnly}
     />
   )
 }
@@ -106,7 +112,7 @@ function FieldControl({
     <label className="form-control w-full my-3 gap-1">
       <div className="flex flex-col gap-0.5">
         <b>
-          {field.title}
+          {formatFieldLabel(field.title)}
           {field.required ? ' *' : ''}
         </b>
         {field.description ? (
@@ -131,7 +137,7 @@ function renderGroupedFields(
   return Object.entries(groups).map(([groupName, groupFields]) => (
     <div key={groupName} className="mt-4 first:mt-0">
       <h4 className="mb-2 text-sm uppercase tracking-wide opacity-60">
-        {groupName}
+        {formatFieldLabel(groupName)}
       </h4>
       {groupFields.map((field) => (
         <FieldControl
@@ -151,11 +157,15 @@ function PassportSection({
   fields: FieldState[]
   onChange: (fieldKey: string, value: PlainValue) => void
 }) {
+  const resolvedFields = useMemo(() => getResolvedPassportFields(fields), [fields])
+
   return (
     <section className="relative rounded-box border-2 border-neutral-content p-4">
       <h2 className="mb-3 text-lg font-semibold">Паспортные данные</h2>
-      <p className="m-0 text-sm opacity-70">Обязательны только фио и дата рождения.</p>
-      {fields.map((field) => (
+      <p className="m-0 text-sm opacity-70">
+        Обязательны только ФИО и дата рождения.
+      </p>
+      {resolvedFields.map((field) => (
         <FieldControl
           key={field.key}
           field={field}
@@ -191,31 +201,33 @@ function VisitEditor({
 
   return (
     <section className="rounded-box border-2 border-neutral-content p-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <button
-          type="button"
-          className="text-left text-lg font-semibold hover:opacity-70"
-          onClick={() => setCollapsed((prev) => !prev)}
-        >
-          {title} {collapsed ? '+' : '-'}
-        </button>
+      <div className="sticky top-20 z-20 -mx-4 mb-3 border-b border-base-300 bg-base-100/95 px-4 py-3 backdrop-blur sm:top-24">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <button
+            type="button"
+            className="text-left text-lg font-semibold hover:opacity-70"
+            onClick={() => setCollapsed((prev) => !prev)}
+          >
+            {title} {collapsed ? '+' : '-'}
+          </button>
 
-        <div className="flex flex-wrap gap-2">
-          <Button
-            buttonType={ButtonTypes.ghost}
-            className="btn-sm"
-            onClick={() => onCopyVisit(visit.id)}
-          >
-            Дублировать
-          </Button>
-          <Button
-            buttonType={ButtonTypes.error}
-            className="btn-sm"
-            onClick={() => onDeleteVisit(visit.id)}
-            disabled={visitsCount === 1}
-          >
-            Удалить
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              buttonType={ButtonTypes.ghost}
+              className="btn-sm"
+              onClick={() => onCopyVisit(visit.id)}
+            >
+              Дублировать
+            </Button>
+            <Button
+              buttonType={ButtonTypes.error}
+              className="btn-sm"
+              onClick={() => onDeleteVisit(visit.id)}
+              disabled={visitsCount === 1}
+            >
+              Удалить
+            </Button>
+          </div>
         </div>
       </div>
 
