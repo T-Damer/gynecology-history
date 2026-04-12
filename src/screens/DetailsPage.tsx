@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai'
-import { useCallback } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
 import ArrowUp from 'components/Icons/ArrowUp'
+import Chart from 'components/Chart'
 import Save from 'components/Icons/Save'
 import Button from 'components/Button'
 import ButtonTypes from 'types/Button'
@@ -26,12 +27,78 @@ import {
   Visit,
 } from 'types/Patient'
 
-function updatePatient(patient: Patient, updater: (current: Patient) => Patient) {
+function updatePatient(
+  patient: Patient,
+  updater: (current: Patient) => Patient
+) {
   return updater(patient)
 }
 
 function safeFileName(value: string) {
   return value.replace(/[\\/:*?"<>|#%]+/g, ' ').trim() || 'patient'
+}
+
+function ScrollJumpButtons() {
+  const [canScrollUp, setCanScrollUp] = useState(false)
+  const [canScrollDown, setCanScrollDown] = useState(false)
+
+  useEffect(() => {
+    const update = () => {
+      const scrollTopPosition = window.scrollY
+      const viewportHeight = window.innerHeight
+      const fullHeight = document.documentElement.scrollHeight
+      const threshold = 16
+
+      setCanScrollUp(scrollTopPosition > threshold)
+      setCanScrollDown(
+        scrollTopPosition + viewportHeight < fullHeight - threshold
+      )
+    }
+
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [])
+
+  if (!canScrollUp && !canScrollDown) return null
+
+  return (
+    <div className="fixed bottom-24 right-4 z-40 flex flex-col gap-2 print:hidden md:right-6">
+      {canScrollUp ? (
+        <Button
+          buttonType={ButtonTypes.ghost}
+          className="btn-circle border border-base-300 bg-base-100 shadow-lg backdrop-blur"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Прокрутить вверх"
+        >
+          <ArrowUp />
+        </Button>
+      ) : null}
+
+      {canScrollDown ? (
+        <Button
+          buttonType={ButtonTypes.ghost}
+          className="btn-circle border border-base-300 bg-base-100 shadow-lg backdrop-blur"
+          onClick={() =>
+            window.scrollTo({
+              top: document.documentElement.scrollHeight,
+              behavior: 'smooth',
+            })
+          }
+          aria-label="Прокрутить вниз"
+        >
+          <span className="rotate-180">
+            <ArrowUp />
+          </span>
+        </Button>
+      ) : null}
+    </div>
+  )
 }
 
 export default function ({ id }: { id: string }) {
@@ -77,7 +144,9 @@ export default function ({ id }: { id: string }) {
       }
 
       setCurrentPatient((patient) => {
-        const targetField = patient.passport.find((field) => field.key === fieldKey)
+        const targetField = patient.passport.find(
+          (field) => field.key === fieldKey
+        )
 
         if (!targetField) return patient
 
@@ -194,7 +263,9 @@ export default function ({ id }: { id: string }) {
   const onCopyVisit = useCallback(
     (visitId: string) => {
       setCurrentPatient((patient) => {
-        const visitIndex = patient.visits.findIndex((visit) => visit.id === visitId)
+        const visitIndex = patient.visits.findIndex(
+          (visit) => visit.id === visitId
+        )
         if (visitIndex < 0) return patient
 
         const visitToCopy = patient.visits[visitIndex]
@@ -242,7 +313,9 @@ export default function ({ id }: { id: string }) {
   const displayName =
     String(getFieldValue(currentPatient.passport, 'fullName') || '').trim() ||
     'Без имени'
-  const phone = String(getFieldValue(currentPatient.passport, 'phone') || '').trim()
+  const phone = String(
+    getFieldValue(currentPatient.passport, 'phone') || ''
+  ).trim()
   const age = calculateAgeFromBirthDate(
     getFieldValue(currentPatient.passport, 'birthDate')
   )
@@ -254,6 +327,16 @@ export default function ({ id }: { id: string }) {
     .filter(Boolean)
     .join(' · ')
   const fileName = safeFileName(displayName)
+  const chartVisits = useMemo(
+    () =>
+      currentPatient.visits.map((visit) => ({
+        visitNumber: visit.visitNumber,
+        visitDate:
+          typeof visit.visitDate.value === 'string' ? visit.visitDate.value : undefined,
+        viralLoad: getFieldValue(visit.fields, 'hpvLog'),
+      })),
+    [currentPatient.visits]
+  )
 
   const saveAndExport = useCallback(() => {
     const missingVisitDate = currentPatient.visits.find(
@@ -294,11 +377,13 @@ export default function ({ id }: { id: string }) {
         onDeleteVisit={onDeleteVisit}
       />
 
+      <Chart visits={chartVisits} />
+
       <div className="flex flex-row w-full gap-x-2 sticky bottom-safe-bottom z-20 print:hidden drop-shadow-md">
         <Button
           buttonType={ButtonTypes.success}
           onClick={saveAndExport}
-          className="w-2/3"
+          className="w-2/3 shadow-xl"
           iconRight={<Save />}
         >
           Экспортировать
@@ -307,11 +392,13 @@ export default function ({ id }: { id: string }) {
         <Button
           buttonType={ButtonTypes.success}
           onClick={scrollTop}
-          className="w-1/3"
+          className="w-1/3 shadow-xl"
         >
           <ArrowUp />
         </Button>
       </div>
+
+      <ScrollJumpButtons />
     </div>
   )
 }
