@@ -256,7 +256,10 @@ function VisitEditor({
   const title = useMemo(() => `Визит ${visit.visitNumber}`, [visit.visitNumber])
 
   return (
-    <section className="rounded-box border-2 border-neutral-content p-4">
+    <section
+      id={`visit-${visit.visitNumber}`}
+      className="scroll-mt-24 rounded-box border-2 border-neutral-content p-4"
+    >
       <div className="sticky top-[4.5rem] z-20 -mx-4 mb-3 border-b border-base-300 bg-base-100/95 px-4 py-3 backdrop-blur">
         <div className="flex items-center justify-between gap-3">
           <div className="text-left text-lg font-semibold">{title}</div>

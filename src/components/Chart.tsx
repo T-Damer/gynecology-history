@@ -9,6 +9,13 @@ interface VisitChartPoint {
   viralLoad: string | number | undefined
 }
 
+function scrollToVisit(visitNumber: number) {
+  const element = document.getElementById(`visit-${visitNumber}`)
+  if (!element) return
+
+  element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 function parseViralLoad(value: string | number | undefined) {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null
   if (!value) return null
@@ -66,6 +73,18 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
         <p className="m-0 text-sm opacity-70">
           Построен по полю «ВПЧ логарифм» на визитах с заполненной датой.
         </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {visits.map((visit) => (
+            <button
+              key={visit.visitNumber}
+              className="btn btn-sm"
+              onClick={() => scrollToVisit(visit.visitNumber)}
+              type="button"
+            >
+              Визит {visit.visitNumber}
+            </button>
+          ))}
+        </div>
       </div>
 
       {isComplete ? (
