@@ -161,7 +161,7 @@ export const visitFieldConfigs: FieldConfig[] = [
   },
   {
     key: 'treated',
-    title: 'Лечила ли',
+    title: 'Лечение ВПЧ',
     options: yesNoCapitalized,
     group: 'Анамнез',
   },
