@@ -12,6 +12,7 @@ export interface FieldConfig {
   key: string
   title: string
   type?: InputType
+  htmlType?: string
   options?: string[]
   placeholder?: string
   description?: string
@@ -19,6 +20,9 @@ export interface FieldConfig {
   group?: string
   required?: boolean
   readOnly?: boolean
+  inputMode?: 'text' | 'numeric' | 'decimal' | 'tel' | 'search' | 'email' | 'url'
+  pattern?: string
+  autoComplete?: string
 }
 
 export interface FieldState extends FieldConfig {

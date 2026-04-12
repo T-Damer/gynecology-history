@@ -42,6 +42,10 @@ export const passportFieldConfigs: FieldConfig[] = [
     title: 'телефон',
     placeholder: '+7 999 123-45-67',
     description: 'Основной контактный номер.',
+    htmlType: 'tel',
+    inputMode: 'numeric',
+    pattern: '[0-9+]*',
+    autoComplete: 'tel',
   },
 ]
 

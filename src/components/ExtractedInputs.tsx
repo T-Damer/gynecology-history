@@ -25,7 +25,11 @@ interface ExtractedInputsProps {
   onDeleteVisit: (visitId: string) => void
 }
 
-function normalizeValue(field: FieldState, value: string, valueAsNumber: number) {
+function normalizeValue(
+  field: FieldState,
+  value: string,
+  valueAsNumber: number
+) {
   if (field.type === 'number') {
     return Number.isNaN(valueAsNumber) ? undefined : valueAsNumber
   }
@@ -68,7 +72,9 @@ function ProcessedInput({
         value={field.value}
         required={field.required}
         {...(max ? { max } : {})}
-        onChange={({ currentTarget }) => onChange(currentTarget.value || undefined)}
+        onChange={({ currentTarget }) =>
+          onChange(currentTarget.value || undefined)
+        }
       />
     )
 
@@ -98,10 +104,13 @@ function ProcessedInput({
           )
         )
       }
-      type={field.type || 'text'}
+      type={field.htmlType || field.type || 'text'}
       step={field.step}
       required={field.required}
       readOnly={field.readOnly}
+      inputMode={field.inputMode}
+      pattern={field.pattern}
+      autoComplete={field.autoComplete}
     />
   )
 }
@@ -141,7 +150,7 @@ function renderGroupedFields(
 
   return Object.entries(groups).map(([groupName, groupFields]) => (
     <div key={groupName} className="mt-4 first:mt-0">
-      <h4 className="sticky top-[10.5rem] z-10 -mx-4 mb-2 border-b border-base-300 bg-base-100 px-4 py-2 text-sm uppercase tracking-wide opacity-80">
+      <h4 className="sticky top-[10.5rem] z-10 -mx-4 mb-2 border-b border-base-300 bg-base-300 px-4 py-2 text-sm uppercase tracking-wide">
         {formatFieldLabel(groupName)}
       </h4>
       {groupFields.map((field) => (
@@ -162,7 +171,10 @@ function PassportSection({
   fields: FieldState[]
   onChange: (fieldKey: string, value: PlainValue) => void
 }) {
-  const resolvedFields = useMemo(() => getResolvedPassportFields(fields), [fields])
+  const resolvedFields = useMemo(
+    () => getResolvedPassportFields(fields),
+    [fields]
+  )
 
   return (
     <section className="relative rounded-box border-2 border-neutral-content p-4">
