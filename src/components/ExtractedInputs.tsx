@@ -328,7 +328,9 @@ export default function ({
       <section className="relative">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Визиты</h2>
+            <h2 className="text-lg font-semibold">
+              Визиты <span className="opacity-70">Всего {patient.visits.length}</span>
+            </h2>
             <p className="m-0 text-sm opacity-70">
               Все визиты используют общие паспортные данные пациента.
             </p>
