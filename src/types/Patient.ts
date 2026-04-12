@@ -23,6 +23,7 @@ export interface FieldConfig {
   inputMode?: 'text' | 'numeric' | 'decimal' | 'tel' | 'search' | 'email' | 'url'
   pattern?: string
   autoComplete?: string
+  multiValue?: boolean
 }
 
 export interface FieldState extends FieldConfig {

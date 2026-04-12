@@ -48,6 +48,38 @@ function ProcessedInput({
   const max = field.key === 'birthDate' ? getBirthDateMaxIso() : undefined
   const min = field.type === 'number' ? 0 : undefined
 
+  if (field.multiValue) {
+    const values = String(field.value || '')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+    const inputValues = [...values, '']
+
+    return (
+      <div className="flex flex-col gap-2">
+        {inputValues.map((itemValue, index) => (
+          <input
+            key={`${field.key}-${index}`}
+            className="placeholder:text-opacity-30 placeholder:text-slate-500 input input-bordered"
+            placeholder={index === 0 ? field.placeholder || '---' : 'Что-то еще'}
+            value={itemValue}
+            onInput={(e) => {
+              const nextValues = [...inputValues]
+              nextValues[index] = e.currentTarget.value
+
+              const normalized = nextValues
+                .map((item) => item.trim())
+                .filter(Boolean)
+                .join(', ')
+
+              onChange(normalized || undefined)
+            }}
+          />
+        ))}
+      </div>
+    )
+  }
+
   if (field.options?.length)
     return (
       <select

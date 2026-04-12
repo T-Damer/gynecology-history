@@ -145,6 +145,7 @@ export const visitFieldConfigs: FieldConfig[] = [
     type: 'textarea',
     placeholder: 'ВПЧ, Хламидии',
     description: multiValueDescription,
+    multiValue: true,
     group: 'Анамнез',
   },
   {
@@ -259,6 +260,7 @@ export const visitFieldConfigs: FieldConfig[] = [
     type: 'textarea',
     placeholder: 'Хламидии',
     description: multiValueDescription,
+    multiValue: true,
     group: 'Осмотр и лечение',
   },
   {
@@ -267,6 +269,7 @@ export const visitFieldConfigs: FieldConfig[] = [
     type: 'textarea',
     placeholder: 'Нормализация микробиоты',
     description: multiValueDescription,
+    multiValue: true,
     group: 'Осмотр и лечение',
   },
   {
