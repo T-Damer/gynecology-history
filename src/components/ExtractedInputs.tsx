@@ -136,7 +136,7 @@ function renderGroupedFields(
 
   return Object.entries(groups).map(([groupName, groupFields]) => (
     <div key={groupName} className="mt-4 first:mt-0">
-      <h4 className="mb-2 text-sm uppercase tracking-wide opacity-60">
+      <h4 className="sticky top-36 z-10 -mx-4 mb-2 border-b border-base-300 bg-base-100/95 px-4 py-2 text-sm uppercase tracking-wide opacity-80 backdrop-blur sm:top-40">
         {formatFieldLabel(groupName)}
       </h4>
       {groupFields.map((field) => (
