@@ -19,12 +19,6 @@ const yesNoLowerCase = ['да', 'нет']
 
 export const passportFieldConfigs: FieldConfig[] = [
   {
-    key: 'telegram',
-    title: 'тел',
-    placeholder: '@patient',
-    description: 'Дополнительный контакт.',
-  },
-  {
     key: 'fullName',
     title: 'фио',
     placeholder: 'Иванова Мария Петровна',
@@ -46,6 +40,7 @@ export const passportFieldConfigs: FieldConfig[] = [
     key: 'phone',
     title: 'телефон',
     placeholder: '+7 999 123-45-67',
+    description: 'Основной контактный номер.',
   },
 ]
 

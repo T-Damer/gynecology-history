@@ -11,19 +11,13 @@ import patientsDataStore from 'atoms/patientsDataStore'
 import { createPatient } from 'types/Patient'
 
 interface DraftPassport {
-  telegram: string | undefined
   fullName: string | undefined
   birthDate: string | undefined
-  age: number | undefined
-  phone: string | undefined
 }
 
 const initialDraft: DraftPassport = {
-  telegram: '',
   fullName: '',
   birthDate: '',
-  age: undefined,
-  phone: '',
 }
 
 const requiredPassportKeys = new Set(
@@ -54,11 +48,8 @@ function AddPatientForm() {
     setPatientsData((prevData) => ({
       ...prevData,
       [v4()]: createPatient({
-        telegram: draft.telegram?.trim() || undefined,
         fullName: draft.fullName?.trim(),
         birthDate: draft.birthDate || undefined,
-        age: draft.age,
-        phone: draft.phone?.trim() || undefined,
       }),
     }))
 
@@ -83,51 +74,15 @@ function AddPatientForm() {
         }
       />
 
-      <div className="grid gap-2 sm:grid-cols-2">
-        <input
-          type="text"
-          placeholder="Тел."
-          className="input input-bordered"
-          value={draft.telegram || ''}
-          onInput={(e) =>
-            setDraft((prev) => ({ ...prev, telegram: e.currentTarget.value }))
-          }
-        />
-        <input
-          type="text"
-          placeholder="Телефон"
-          className="input input-bordered"
-          value={draft.phone || ''}
-          onInput={(e) =>
-            setDraft((prev) => ({ ...prev, phone: e.currentTarget.value }))
-          }
-        />
-        <input
-          type="date"
-          className="input input-bordered"
-          required={requiredPassportKeys.has('birthDate')}
-          value={draft.birthDate || ''}
-          onInput={(e) =>
-            setDraft((prev) => ({ ...prev, birthDate: e.currentTarget.value }))
-          }
-        />
-        <input
-          type="number"
-          min="0"
-          step="1"
-          placeholder="Возраст"
-          className="input input-bordered"
-          value={draft.age ?? ''}
-          onInput={(e) =>
-            setDraft((prev) => ({
-              ...prev,
-              age: Number.isNaN(e.currentTarget.valueAsNumber)
-                ? undefined
-                : e.currentTarget.valueAsNumber,
-            }))
-          }
-        />
-      </div>
+      <input
+        type="date"
+        className="input input-bordered"
+        required={requiredPassportKeys.has('birthDate')}
+        value={draft.birthDate || ''}
+        onInput={(e) =>
+          setDraft((prev) => ({ ...prev, birthDate: e.currentTarget.value }))
+        }
+      />
 
       <div className="flex items-center gap-x-2 pr-1.5">
         <Button

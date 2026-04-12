@@ -25,9 +25,8 @@ export default function ({ search }: { search?: string }) {
         'Без имени'
       const birthDate = String(getFieldValue(patient.passport, 'birthDate') || '')
       const phone = String(getFieldValue(patient.passport, 'phone') || '')
-      const telegram = String(getFieldValue(patient.passport, 'telegram') || '')
 
-      if (!matchesSearch(search || '', [displayName, birthDate, phone, telegram]))
+      if (!matchesSearch(search || '', [displayName, birthDate, phone]))
         return null
 
       return (
