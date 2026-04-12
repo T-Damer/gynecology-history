@@ -25,6 +25,42 @@ interface ExtractedInputsProps {
   onDeleteVisit: (visitId: string) => void
 }
 
+interface HpvPairRow {
+  type: string
+  log: string
+}
+
+function splitCommaSeparatedValues(
+  value: PlainValue,
+  preserveEmpty = false
+): string[] {
+  if (typeof value !== 'string' || value.length === 0) return []
+
+  const values = value.split(',').map((item) => item.trim())
+  return preserveEmpty ? values : values.filter(Boolean)
+}
+
+function serializeHpvPairRows(rows: HpvPairRow[]) {
+  const normalizedRows = rows
+    .map((row) => ({
+      type: row.type.trim(),
+      log: row.log.trim(),
+    }))
+    .filter((row) => row.type.length > 0)
+
+  if (normalizedRows.length === 0) {
+    return {
+      types: undefined,
+      logs: undefined,
+    }
+  }
+
+  return {
+    types: normalizedRows.map((row) => row.type).join(', '),
+    logs: normalizedRows.map((row) => row.log).join(', '),
+  }
+}
+
 function normalizeValue(
   field: FieldState,
   value: string,
@@ -175,6 +211,85 @@ function FieldControl({
   )
 }
 
+function HpvPairControl({
+  typeField,
+  logField,
+  onTypeChange,
+  onLogChange,
+}: {
+  typeField: FieldState
+  logField: FieldState
+  onTypeChange: (value: PlainValue) => void
+  onLogChange: (value: PlainValue) => void
+}) {
+  const typeValues = splitCommaSeparatedValues(typeField.value)
+  const logValues = splitCommaSeparatedValues(logField.value, true)
+  const rows: HpvPairRow[] = Array.from(
+    { length: Math.max(typeValues.length, 1) + 1 },
+    (_, index) => ({
+      type: typeValues[index] || '',
+      log: logValues[index] || '',
+    })
+  )
+
+  const updateRows = (
+    index: number,
+    key: keyof HpvPairRow,
+    nextValue: string
+  ) => {
+    const nextRows = rows.map((row, rowIndex) =>
+      rowIndex === index ? { ...row, [key]: nextValue } : row
+    )
+    const serialized = serializeHpvPairRows(nextRows)
+
+    onTypeChange(serialized.types)
+    onLogChange(serialized.logs)
+  }
+
+  return (
+    <div className="form-control my-3 w-full gap-2">
+      <div className="flex flex-col gap-0.5">
+        <b>
+          {formatFieldLabel(typeField.title)} /{' '}
+          {formatFieldLabel(logField.title)}
+        </b>
+        <span className="text-xs opacity-70">
+          Для каждого ВПЧ типа укажите свой логарифм.
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        {rows.map((row, index) => (
+          <div
+            key={`${typeField.key}-${index}`}
+            className="grid gap-2 sm:grid-cols-2"
+          >
+            <input
+              className="input input-bordered placeholder:text-opacity-30 placeholder:text-slate-500"
+              placeholder={
+                index === 0 ? typeField.placeholder || '---' : 'Что-то еще'
+              }
+              value={row.type}
+              onInput={(e) => updateRows(index, 'type', e.currentTarget.value)}
+              type="text"
+            />
+            <input
+              className="input input-bordered placeholder:text-opacity-30 placeholder:text-slate-500"
+              placeholder={
+                index === 0 ? logField.placeholder || '---' : 'Логарифм'
+              }
+              value={row.log}
+              onInput={(e) => updateRows(index, 'log', e.currentTarget.value)}
+              type="text"
+              inputMode={logField.inputMode}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function renderGroupedFields(
   fields: FieldState[],
   onChange: (fieldKey: string, value: PlainValue) => void
@@ -190,13 +305,35 @@ function renderGroupedFields(
       <h4 className="sticky top-[10.5rem] z-10 -mx-4 mb-2 border-b border-base-300 bg-base-300 px-4 py-2 text-sm uppercase tracking-wide">
         {formatFieldLabel(groupName)}
       </h4>
-      {groupFields.map((field) => (
-        <FieldControl
-          key={field.key}
-          field={field}
-          onChange={(value) => onChange(field.key, value)}
-        />
-      ))}
+      {groupFields.map((field) => {
+        if (field.key === 'hpvLog') return null
+
+        if (field.key === 'hpvType') {
+          const logField = groupFields.find(
+            (groupField) => groupField.key === 'hpvLog'
+          )
+
+          if (logField) {
+            return (
+              <HpvPairControl
+                key={field.key}
+                typeField={field}
+                logField={logField}
+                onTypeChange={(value) => onChange(field.key, value)}
+                onLogChange={(value) => onChange(logField.key, value)}
+              />
+            )
+          }
+        }
+
+        return (
+          <FieldControl
+            key={field.key}
+            field={field}
+            onChange={(value) => onChange(field.key, value)}
+          />
+        )
+      })}
     </div>
   ))
 }

@@ -10,6 +10,20 @@ import {
 import { read, utils } from 'xlsx'
 import handleError from './handleError'
 
+const legacyFieldTitleMap: Record<string, string[]> = {
+  cytologyChangesHistory: ['Изменения вцитологии'],
+}
+
+function getFieldRawValue(field: FieldState, row: Record<string, unknown>) {
+  if (row[field.title] !== undefined) return row[field.title]
+
+  const legacyTitle = legacyFieldTitleMap[field.key]?.find(
+    (title) => row[title] !== undefined
+  )
+
+  return legacyTitle ? row[legacyTitle] : undefined
+}
+
 function parseImportedValue(field: FieldState, rawValue: unknown): PlainValue {
   if (rawValue === undefined || rawValue === null || rawValue === '')
     return undefined
@@ -27,7 +41,7 @@ function parseImportedValue(field: FieldState, rawValue: unknown): PlainValue {
 function fillFieldState(fields: FieldState[], row: Record<string, unknown>) {
   return fields.map((field) => ({
     ...field,
-    value: parseImportedValue(field, row[field.title]),
+    value: parseImportedValue(field, getFieldRawValue(field, row)),
   }))
 }
 

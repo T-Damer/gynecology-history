@@ -335,7 +335,8 @@ export default function ({ id }: { id: string }) {
           typeof visit.visitDate.value === 'string'
             ? visit.visitDate.value
             : undefined,
-        viralLoad: getFieldValue(visit.fields, 'hpvLog'),
+        hpvTypes: getFieldValue(visit.fields, 'hpvType'),
+        hpvLogs: getFieldValue(visit.fields, 'hpvLog'),
       })),
     [currentPatient.visits]
   )

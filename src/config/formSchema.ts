@@ -170,7 +170,7 @@ export const visitFieldConfigs: FieldConfig[] = [
   },
   {
     key: 'cytologyChangesHistory',
-    title: 'Изменения вцитологии',
+    title: 'Изменения в цитологии',
     options: [
       'Норма',
       'ASCUS',
@@ -278,7 +278,7 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'hpvType',
     title: 'ВПЧ тип',
-    placeholder: '16, 18',
+    placeholder: '16',
     description: freeTextDescription,
     group: 'Осмотр и лечение',
   },
@@ -287,6 +287,7 @@ export const visitFieldConfigs: FieldConfig[] = [
     title: 'ВПЧ логарифм',
     placeholder: '3.2',
     description: freeTextDescription,
+    inputMode: 'decimal',
     group: 'Осмотр и лечение',
   },
   {
