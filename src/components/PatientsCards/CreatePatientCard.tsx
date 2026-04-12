@@ -4,6 +4,7 @@ import { v4 } from 'uuid'
 import Button from 'components/Button'
 import ButtonTypes from 'types/Button'
 import Card from 'components/Card'
+import { passportFieldConfigs } from 'config/formSchema'
 import handleError from 'helpers/handleError'
 import importXlsxPatient from 'helpers/importXlsxPatient'
 import patientsDataStore from 'atoms/patientsDataStore'
@@ -25,6 +26,10 @@ const initialDraft: DraftPassport = {
   phone: '',
 }
 
+const requiredPassportKeys = new Set(
+  passportFieldConfigs.filter((field) => field.required).map((field) => field.key)
+)
+
 function AddPatientForm() {
   const [draft, setDraft] = useState<DraftPassport>(initialDraft)
   const setPatientsData = useSetAtom(patientsDataStore)
@@ -36,6 +41,12 @@ function AddPatientForm() {
   const onSubmit = useCallback(() => {
     if (!draft.fullName?.trim()) {
       const error = 'Введите ФИО пациента'
+      handleError({ e: error, toastMessage: error })
+      return
+    }
+
+    if (!draft.birthDate) {
+      const error = 'Введите дату рождения пациента'
       handleError({ e: error, toastMessage: error })
       return
     }
@@ -54,15 +65,19 @@ function AddPatientForm() {
     clearData()
   }, [clearData, draft, setPatientsData])
 
-  const disabled = useMemo(() => !draft.fullName?.trim(), [draft.fullName])
+  const disabled = useMemo(
+    () => !draft.fullName?.trim() || !draft.birthDate,
+    [draft.birthDate, draft.fullName]
+  )
 
   return (
     <div className="flex flex-col gap-2 justify-center">
       <input
         type="text"
-        placeholder="ФИО"
+        placeholder="ФИО *"
         className="input input-bordered"
         value={draft.fullName || ''}
+        required={requiredPassportKeys.has('fullName')}
         onInput={(e) =>
           setDraft((prev) => ({ ...prev, fullName: e.currentTarget.value }))
         }
@@ -90,6 +105,7 @@ function AddPatientForm() {
         <input
           type="date"
           className="input input-bordered"
+          required={requiredPassportKeys.has('birthDate')}
           value={draft.birthDate || ''}
           onInput={(e) =>
             setDraft((prev) => ({ ...prev, birthDate: e.currentTarget.value }))

@@ -17,6 +17,7 @@ export interface FieldConfig {
   description?: string
   step?: number
   group?: string
+  required?: boolean
 }
 
 export interface FieldState extends FieldConfig {

@@ -28,11 +28,13 @@ export const passportFieldConfigs: FieldConfig[] = [
     key: 'fullName',
     title: 'фио',
     placeholder: 'Иванова Мария Петровна',
+    required: true,
   },
   {
     key: 'birthDate',
     title: 'дата рождения',
     type: 'date',
+    required: true,
   },
   {
     key: 'age',

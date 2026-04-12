@@ -39,6 +39,7 @@ function ProcessedInput({
       <select
         className="select select-bordered"
         value={String(field.value || '')}
+        required={field.required}
         onInput={(e) => {
           const nextValue = e.currentTarget.value
           onChange(nextValue || undefined)
@@ -57,6 +58,7 @@ function ProcessedInput({
     return (
       <DateInput
         value={field.value}
+        required={field.required}
         onChange={({ currentTarget }) => onChange(currentTarget.value || undefined)}
       />
     )
@@ -67,6 +69,7 @@ function ProcessedInput({
         className="textarea textarea-bordered min-h-28"
         placeholder={field.placeholder || '---'}
         value={String(field.value || '')}
+        required={field.required}
         onInput={(e) => onChange(e.currentTarget.value || undefined)}
       />
     )
@@ -87,6 +90,7 @@ function ProcessedInput({
       }
       type={field.type || 'text'}
       step={field.step}
+      required={field.required}
     />
   )
 }
@@ -101,7 +105,10 @@ function FieldControl({
   return (
     <label className="form-control w-full my-3 gap-1">
       <div className="flex flex-col gap-0.5">
-        <b>{field.title}</b>
+        <b>
+          {field.title}
+          {field.required ? ' *' : ''}
+        </b>
         {field.description ? (
           <span className="text-xs opacity-70">{field.description}</span>
         ) : null}
@@ -147,6 +154,7 @@ function PassportSection({
   return (
     <section className="relative rounded-box border-2 border-neutral-content p-4">
       <h2 className="mb-3 text-lg font-semibold">Паспортные данные</h2>
+      <p className="m-0 text-sm opacity-70">Обязательны только фио и дата рождения.</p>
       {fields.map((field) => (
         <FieldControl
           key={field.key}

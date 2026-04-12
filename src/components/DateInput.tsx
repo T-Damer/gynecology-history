@@ -5,9 +5,11 @@ import CalendarIcon from 'components/Icons/CalendarIcon'
 export default function ({
   value,
   onChange,
+  required,
 }: {
   value: string | number | undefined
   onChange: OnChange
+  required: boolean | undefined
 }) {
   const dateInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -19,7 +21,7 @@ export default function ({
         onInput={onChange}
         type="date"
         ref={dateInputRef}
-        required
+        required={required}
       />
       <CalendarIcon onPress={() => dateInputRef.current?.showPicker()} />
     </label>

@@ -71,12 +71,29 @@ export default function ({ id }: { id: string }) {
         return
       }
 
-      setCurrentPatient((patient) => ({
-        ...patient,
-        passport: patient.passport.map((field) =>
-          field.key === fieldKey ? { ...field, value } : field
-        ),
-      }))
+      setCurrentPatient((patient) => {
+        const targetField = patient.passport.find((field) => field.key === fieldKey)
+
+        if (!targetField) return patient
+
+        const isEmptyRequiredValue =
+          targetField.required &&
+          (value === undefined ||
+            (typeof value === 'string' && value.trim().length === 0))
+
+        if (isEmptyRequiredValue) {
+          const error = `Поле "${targetField.title}" обязательно`
+          handleError({ e: error, toastMessage: error })
+          return patient
+        }
+
+        return {
+          ...patient,
+          passport: patient.passport.map((field) =>
+            field.key === fieldKey ? { ...field, value } : field
+          ),
+        }
+      })
     },
     [setCurrentPatient]
   )
