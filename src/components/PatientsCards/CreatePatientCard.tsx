@@ -73,7 +73,6 @@ function AddPatientForm() {
 
   return (
     <div className="flex flex-col gap-2 justify-center">
-      <h2 className="m-0 text-lg font-semibold">Создать пациента</h2>
 
       <div className="form-control w-full gap-1">
         <span className="text-sm font-medium">Имя пациента</span>

@@ -10,11 +10,7 @@ export default function () {
 
   return (
     <div>
-      <h1>Gynecology history</h1>
-      <p className="mt-0 opacity-70">
-        Создавайте карточки пациентов, добавляйте неограниченное количество
-        визитов и экспортируйте данные в Excel по строке на визит.
-      </p>
+      <h1>🚺 Gynecology history</h1>
       <SearchBar search={search} setSearch={setSearch} />
       <div className="flex flex-wrap" ref={parentRef}>
         <CreatePatientCard />

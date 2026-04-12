@@ -13,7 +13,7 @@ export default function ({ children, dashedOutline, onPress }: CardProps) {
 
   return (
     <div
-      className={`flex-1 ${bgHover} ${minWidth} ${justify} min-h-40 shadow-md border-2 border-neutral-content ${outline} cursor-pointer rounded-box p-3 m-1 transition-all flex align-center pointer-events-auto`}
+      className={`flex-1 ${bgHover} ${minWidth} ${justify} min-h-64 shadow-md border-2 border-neutral-content ${outline} cursor-pointer rounded-box p-3 m-1 transition-all flex align-center pointer-events-auto`}
       onClick={onPress}
     >
       {children}
