@@ -272,7 +272,7 @@ export const visitFieldConfigs: FieldConfig[] = [
   {
     key: 'pcr',
     title: 'ПЦР',
-    options: ['Норма', 'Анаэробы', 'Аэробы'],
+    options: ['Норма', 'Анаэробы', 'Аэробы', 'Смешанный вагинит'],
     group: 'Осмотр и лечение',
   },
   {
