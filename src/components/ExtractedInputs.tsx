@@ -31,7 +31,8 @@ function normalizeValue(
   valueAsNumber: number
 ) {
   if (field.type === 'number') {
-    return Number.isNaN(valueAsNumber) ? undefined : valueAsNumber
+    if (Number.isNaN(valueAsNumber)) return undefined
+    return valueAsNumber < 0 ? undefined : valueAsNumber
   }
 
   return value || undefined
@@ -45,6 +46,7 @@ function ProcessedInput({
   onChange: (value: PlainValue) => void
 }) {
   const max = field.key === 'birthDate' ? getBirthDateMaxIso() : undefined
+  const min = field.type === 'number' ? 0 : undefined
 
   if (field.options?.length)
     return (
@@ -105,6 +107,7 @@ function ProcessedInput({
         )
       }
       type={field.htmlType || field.type || 'text'}
+      min={min}
       step={field.step}
       required={field.required}
       readOnly={field.readOnly}
