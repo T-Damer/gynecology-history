@@ -15,6 +15,7 @@
     "@formkit/auto-animate": "^0.8.2",
     "@kbox-labs/react-echarts": "^1.2.1",
     "echarts": "^5.5.1",
+    "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "jotai": "^2.10.1",
     "preact": "^10.24.3",

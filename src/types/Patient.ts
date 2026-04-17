@@ -6,7 +6,7 @@ import {
 import { getTodayIso } from 'helpers/patientDerived'
 import { v4 } from 'uuid'
 
-export type InputType = 'number' | 'date' | 'string' | 'textarea'
+export type InputType = 'number' | 'date' | 'string' | 'textarea' | 'image'
 export type PlainValue = number | string | undefined
 
 export interface FieldConfig {

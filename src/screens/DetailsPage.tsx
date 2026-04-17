@@ -355,7 +355,7 @@ export default function ({ id }: { id: string }) {
     [currentPatient.visits]
   )
 
-  const saveAndExport = useCallback(() => {
+  const saveAndExport = useCallback(async () => {
     const missingVisitDate = currentPatient.visits.find(
       (visit) =>
         visit.visitDate.required &&
@@ -372,7 +372,14 @@ export default function ({ id }: { id: string }) {
       return
     }
 
-    saveObjectAsXlsx(fileName, currentPatient)
+    try {
+      await saveObjectAsXlsx(fileName, currentPatient)
+    } catch (error) {
+      handleError({
+        e: error,
+        toastMessage: 'Не удалось экспортировать файл',
+      })
+    }
   }, [currentPatient, fileName])
 
   return (
@@ -400,7 +407,9 @@ export default function ({ id }: { id: string }) {
       <div className="flex flex-row w-full gap-x-2 bottom-safe-bottom z-20 print:hidden drop-shadow-md">
         <Button
           buttonType={ButtonTypes.success}
-          onClick={saveAndExport}
+          onClick={() => {
+            void saveAndExport()
+          }}
           className="w-2/3 shadow-xl"
           iconRight={<Save />}
         >

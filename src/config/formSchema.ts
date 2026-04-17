@@ -335,4 +335,11 @@ export const visitFieldConfigs: FieldConfig[] = [
     options: yesNoLowerCase,
     group: 'Осмотр и лечение',
   },
+  {
+    key: 'photo',
+    title: 'Фото',
+    type: 'image',
+    description: 'Перетащите изображение сюда или нажмите для выбора файла.',
+    group: 'Осмотр и лечение',
+  },
 ]

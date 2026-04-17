@@ -1,12 +1,14 @@
 import { useAutoAnimate } from '@formkit/auto-animate/preact'
 import Button from 'components/Button'
 import DateInput from 'components/DateInput'
+import handleError from 'helpers/handleError'
 import {
   formatFieldLabel,
   getBirthDateMaxIso,
   getResolvedPassportFields,
 } from 'helpers/patientDerived'
-import { useMemo, useState } from 'preact/hooks'
+import processImageFile from 'helpers/processImageFile'
+import { useMemo, useRef, useState } from 'preact/hooks'
 import ButtonTypes from 'types/Button'
 import type { FieldState, Patient, PlainValue, Visit } from 'types/Patient'
 
@@ -87,6 +89,110 @@ function normalizeValue(
   }
 
   return value || undefined
+}
+
+function PhotoInput({
+  field,
+  onChange,
+}: {
+  field: FieldState
+  onChange: (value: PlainValue) => void
+}) {
+  const [isDragging, setIsDragging] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      const error = 'Можно загружать только изображения'
+      handleError({ e: error, toastMessage: error })
+      return
+    }
+
+    setIsProcessing(true)
+
+    try {
+      const imageDataUrl = await processImageFile(file)
+      onChange(imageDataUrl)
+    } catch (error) {
+      handleError({
+        e: error,
+        toastMessage: 'Не удалось обработать изображение',
+      })
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onInput={(e) => {
+          void handleFile(e.currentTarget.files?.[0])
+          e.currentTarget.value = ''
+        }}
+      />
+
+      <button
+        type="button"
+        className={`flex min-h-44 w-full flex-col items-center justify-center rounded-box border-2 border-dashed px-4 py-6 text-center transition ${
+          isDragging
+            ? 'border-primary bg-primary/10'
+            : 'border-base-300 bg-base-200/30'
+        }`}
+        onClick={() => inputRef.current?.click()}
+        onDragOver={(event) => {
+          event.preventDefault()
+          setIsDragging(true)
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(event) => {
+          event.preventDefault()
+          setIsDragging(false)
+          void handleFile(event.dataTransfer?.files?.[0])
+        }}
+      >
+        {typeof field.value === 'string' && field.value ? (
+          <img
+            src={field.value}
+            alt={field.title}
+            className="max-h-56 w-auto rounded-box object-contain shadow"
+          />
+        ) : (
+          <div className="space-y-2">
+            <p className="m-0 font-medium">Перетащите фото сюда</p>
+            <p className="m-0 text-sm opacity-70">
+              или нажмите, чтобы выбрать файл
+            </p>
+          </div>
+        )}
+      </button>
+
+      <div className="flex flex-wrap gap-2">
+        <Button
+          buttonType={ButtonTypes.ghost}
+          onClick={() => inputRef.current?.click()}
+          disabled={isProcessing}
+        >
+          {isProcessing ? 'Обработка...' : 'Выбрать фото'}
+        </Button>
+
+        <Button
+          buttonType={ButtonTypes.error}
+          onClick={() => onChange(undefined)}
+          disabled={isProcessing || !field.value}
+        >
+          Удалить фото
+        </Button>
+      </div>
+    </div>
+  )
 }
 
 function ProcessedInput({
@@ -174,6 +280,10 @@ function ProcessedInput({
         onInput={(e) => onChange(e.currentTarget.value || undefined)}
       />
     )
+
+  if (field.type === 'image') {
+    return <PhotoInput field={field} onChange={onChange} />
+  }
 
   return (
     <input

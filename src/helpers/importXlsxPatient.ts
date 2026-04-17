@@ -9,6 +9,7 @@ import {
 } from 'types/Patient'
 import { read, utils } from 'xlsx'
 import handleError from './handleError'
+import { photosSheetName } from './saveObjectAsXlsx'
 
 const legacyFieldTitleMap: Record<string, string[]> = {
   cytologyChangesHistory: ['Изменения вцитологии'],
@@ -45,6 +46,31 @@ function fillFieldState(fields: FieldState[], row: Record<string, unknown>) {
   }))
 }
 
+function getPhotoMap(workBook: ReturnType<typeof read>) {
+  const photoSheet = workBook.Sheets[photosSheetName]
+  if (!photoSheet) return new Map<number, string>()
+
+  const rows = utils.sheet_to_json<
+    Record<string, unknown> & {
+      visitNumber?: unknown
+      photo?: unknown
+    }
+  >(photoSheet, {
+    defval: '',
+  })
+
+  return new Map(
+    rows.flatMap((row) => {
+      const visitNumber = Number(row.visitNumber)
+      const photo = typeof row.photo === 'string' ? row.photo : ''
+
+      if (!Number.isInteger(visitNumber) || !photo) return []
+
+      return [[visitNumber, photo]]
+    })
+  )
+}
+
 export default async function (
   e: JSXInternal.TargetedInputEvent<HTMLInputElement>
 ) {
@@ -59,6 +85,7 @@ export default async function (
   const data = await file.arrayBuffer()
   const workBook = read(data)
   const workSheet = workBook.Sheets[workBook.SheetNames[0]]
+  const photoMap = getPhotoMap(workBook)
   const rows = utils.sheet_to_json<Record<string, unknown>>(workSheet, {
     defval: '',
   })
@@ -84,7 +111,14 @@ export default async function (
         ...visit.interval,
         value: parseImportedValue(visit.interval, row[visit.interval.title]),
       },
-      fields: fillFieldState(visit.fields, row),
+      fields: fillFieldState(visit.fields, row).map((field) =>
+        field.key === 'photo'
+          ? {
+              ...field,
+              value: photoMap.get(index + 1),
+            }
+          : field
+      ),
     }
   })
 
