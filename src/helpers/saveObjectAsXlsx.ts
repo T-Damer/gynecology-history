@@ -45,9 +45,9 @@ export default async function saveObjectAsXlsx(
   }))
 
   if (photoColumnIndex !== null) {
-    data.visits.forEach((visit, index) => {
+    for (const [index, visit] of data.visits.entries()) {
       const photoField = visit.fields.find((field) => field.key === 'photo')
-      if (typeof photoField?.value !== 'string' || !photoField.value) return
+      if (typeof photoField?.value !== 'string' || !photoField.value) continue
 
       const rowNumber = index + 2
       const imageId = workbook.addImage({
@@ -60,7 +60,7 @@ export default async function saveObjectAsXlsx(
         tl: { col: photoColumnIndex - 1 + 0.05, row: rowNumber - 1 + 0.05 },
         ext: { width: 170, height: 170 },
       })
-    })
+    }
   }
 
   photosWorksheet.addRow(['visitNumber', 'photo'])

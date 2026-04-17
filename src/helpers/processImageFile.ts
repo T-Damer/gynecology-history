@@ -46,6 +46,14 @@ function getScaledDimensions(width: number, height: number) {
   }
 }
 
+function getPreferredOutputMimeType(file: File) {
+  if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+    return 'image/jpeg' as const
+  }
+
+  return 'image/png' as const
+}
+
 export default async function processImageFile(file: File) {
   const sourceDataUrl = await readFileAsDataUrl(file)
   const image = await loadImage(sourceDataUrl)
@@ -59,6 +67,16 @@ export default async function processImageFile(file: File) {
   if (!context) throw new Error('Не удалось подготовить изображение')
 
   context.drawImage(image, 0, 0, width, height)
+
+  const preferredMimeType = getPreferredOutputMimeType(file)
+
+  if (preferredMimeType === 'image/png') {
+    const pngDataUrl = canvas.toDataURL('image/png')
+
+    if (pngDataUrl.length <= TARGET_DATA_URL_LENGTH) {
+      return pngDataUrl
+    }
+  }
 
   let bestDataUrl = canvas.toDataURL('image/jpeg', QUALITY_STEPS[0])
 
