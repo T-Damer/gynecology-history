@@ -29,6 +29,11 @@ const chartColors = [
   '#ec4899',
   '#14b8a6',
 ]
+const minBarsPerVisit = 2
+const barWidthPx = 10
+const barGapPx = 4
+const slotPaddingPx = 8
+const chartSideSpacePx = 120
 
 function scrollToVisit(visitNumber: number) {
   const element =
@@ -115,7 +120,12 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
     (visit) => toTimestamp(visit.visitDate) !== null
   )
   const isComplete = hasAllVisitDates && uniqueTypes.length > 0
-  const chartMinWidth = Math.max(720, datedVisits.length * 120)
+  const barsPerVisit = Math.max(minBarsPerVisit, uniqueTypes.length)
+  const visitSlotWidth =
+    barsPerVisit * barWidthPx +
+    Math.max(barsPerVisit - 1, 0) * barGapPx +
+    slotPaddingPx
+  const chartWidth = datedVisits.length * visitSlotWidth + chartSideSpacePx
 
   const series = uniqueTypes.map((type, index) => ({
     name: `ВПЧ ${type}`,
@@ -128,7 +138,7 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
     itemStyle: {
       color: chartColors[index % chartColors.length],
     },
-    barMaxWidth: 14,
+    barWidth: barWidthPx,
     barMinHeight: 4,
     showBackground: true,
     backgroundStyle: {
@@ -161,9 +171,9 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
       {isComplete ? (
         <div className="-mx-1 overflow-x-auto px-1 pb-2">
           <div
-            className="relative min-h-72"
+            className="relative inline-block min-h-72 align-top"
             style={{
-              minWidth: `${chartMinWidth}px`,
+              width: `${chartWidth}px`,
               background:
                 'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
               backgroundSize: '12px 12px',

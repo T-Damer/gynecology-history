@@ -8,6 +8,12 @@ import {
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 
+const minBarsPerVisit = 2
+const barWidthPx = 10
+const barGapPx = 4
+const slotPaddingPx = 8
+const chartSideSpacePx = 120
+
 interface VisitStatusPoint {
   visitNumber: number
   visitDate: string | undefined
@@ -92,7 +98,11 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
     new Set([...cytologyOptions, ...colposcopyOptions])
   )
   const isComplete = hasAllVisitDates && hasAnyStatuses
-  const chartMinWidth = Math.max(720, datedVisits.length * 120)
+  const visitSlotWidth =
+    minBarsPerVisit * barWidthPx +
+    (minBarsPerVisit - 1) * barGapPx +
+    slotPaddingPx
+  const chartWidth = datedVisits.length * visitSlotWidth + chartSideSpacePx
 
   const cytologySeries = datedVisits.map((visit) => {
     const statusIndex = getStatusIndex(visit.cytology, statusCategories)
@@ -133,9 +143,9 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
       {isComplete ? (
         <div className="-mx-1 overflow-x-auto px-1 pb-2">
           <div
-            className="relative min-h-72"
+            className="relative inline-block min-h-72 align-top"
             style={{
-              minWidth: `${chartMinWidth}px`,
+              width: `${chartWidth}px`,
               background:
                 'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
               backgroundSize: '12px 12px',
@@ -217,7 +227,7 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                   type: 'bar',
                   data: cytologySeries,
                   itemStyle: { color: '#2563eb' },
-                  barMaxWidth: 14,
+                  barWidth: barWidthPx,
                   barMinHeight: 4,
                   showBackground: true,
                   backgroundStyle: {
@@ -229,7 +239,7 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                   type: 'bar',
                   data: colposcopySeries,
                   itemStyle: { color: '#dc2626' },
-                  barMaxWidth: 14,
+                  barWidth: barWidthPx,
                   barMinHeight: 4,
                   showBackground: true,
                   backgroundStyle: {
