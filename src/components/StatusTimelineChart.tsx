@@ -11,8 +11,8 @@ import { CanvasRenderer } from 'echarts/renderers'
 const minBarsPerVisit = 2
 const barWidthPx = 10
 const barGapPx = 4
-const slotPaddingPx = 8
-const chartSideSpacePx = 120
+const slotPaddingPx = 4
+const chartSideSpacePx = 80
 
 interface VisitStatusPoint {
   visitNumber: number
@@ -168,8 +168,8 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                 type: 'scroll',
               }}
               grid={{
-                left: 12,
-                right: 18,
+                left: 8,
+                right: 12,
                 top: 88,
                 bottom: 76,
                 containLabel: true,
