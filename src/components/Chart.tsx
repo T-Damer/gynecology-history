@@ -1,5 +1,5 @@
 import { EChart } from '@kbox-labs/react-echarts'
-import { LineChart } from 'echarts/charts'
+import { BarChart } from 'echarts/charts'
 import {
   GridComponent,
   LegendComponent,
@@ -90,6 +90,7 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
       return {
         visitNumber: visit.visitNumber,
         timestamp,
+        label: formatVisitDate(timestamp),
         hpvPoints: getHpvPoints(visit),
       }
     })
@@ -99,6 +100,7 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
       ): point is {
         visitNumber: number
         timestamp: number
+        label: string
         hpvPoints: HpvPoint[]
       } => Boolean(point)
     )
@@ -117,21 +119,20 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
 
   const series = uniqueTypes.map((type, index) => ({
     name: `ВПЧ ${type}`,
-    type: 'line' as const,
-    smooth: true,
-    symbol: 'circle' as const,
-    symbolSize: 10,
+    type: 'bar' as const,
     data: datedVisits.map((visit) => {
       const matchingPoint = visit.hpvPoints.find((point) => point.type === type)
 
-      return [visit.timestamp, matchingPoint?.log ?? 0]
+      return matchingPoint?.log ?? 0
     }),
-    lineStyle: {
-      width: 3,
-      color: chartColors[index % chartColors.length],
-    },
     itemStyle: {
       color: chartColors[index % chartColors.length],
+    },
+    barMaxWidth: 14,
+    barMinHeight: 4,
+    showBackground: true,
+    backgroundStyle: {
+      color: 'rgba(148, 163, 184, 0.12)',
     },
   }))
 
@@ -140,8 +141,8 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
       <div className="mb-4">
         <h2 className="m-0 text-lg font-semibold">График вирусной нагрузки</h2>
         <p className="m-0 text-sm opacity-70">
-          Для каждого ВПЧ типа строится отдельная линия. Если на визите логарифм
-          не указан, используется 0.
+          Для каждого ВПЧ типа показывается отдельный тонкий столбец. Если на
+          визите логарифм не указан, используется 0.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {visits.map((visit) => (
@@ -169,12 +170,12 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
             }}
           >
             <EChart
-              className="h-72 w-full"
+              className="h-[32rem] w-full"
               use={[
                 GridComponent,
                 LegendComponent,
                 TooltipComponent,
-                LineChart,
+                BarChart,
                 CanvasRenderer,
               ]}
               renderer="canvas"
@@ -188,21 +189,26 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
                 left: 12,
                 right: 18,
                 top: 88,
-                bottom: 52,
+                bottom: 64,
                 containLabel: true,
               }}
               tooltip={{
                 trigger: 'axis',
+                axisPointer: {
+                  type: 'shadow',
+                },
                 valueFormatter: (value) =>
                   typeof value === 'number' ? value.toFixed(2) : String(value),
                 formatter: (params) => {
                   const points = Array.isArray(params) ? params : [params]
-                  const [timestamp] = points[0].value as [number, number]
+                  const pointIndex = points[0]?.dataIndex ?? 0
+                  const visit = datedVisits[pointIndex]
 
                   return [
-                    `<strong>${formatVisitDate(timestamp)}</strong>`,
+                    `<strong>${visit.label}</strong>`,
+                    `Визит ${visit.visitNumber}`,
                     ...points.map((point) => {
-                      const [, viralLoad] = point.value as [number, number]
+                      const viralLoad = Number(point.value)
 
                       return `${point.marker}${point.seriesName}: ${viralLoad.toFixed(2)}`
                     }),
@@ -210,16 +216,13 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
                 },
               }}
               xAxis={{
-                type: 'time',
+                type: 'category',
+                data: datedVisits.map((visit) => visit.label),
                 axisLabel: {
                   color: 'currentColor',
+                  interval: 0,
                   hideOverlap: true,
                   rotate: 30,
-                  formatter: (value: number) =>
-                    new Intl.DateTimeFormat('ru-RU', {
-                      day: '2-digit',
-                      month: '2-digit',
-                    }).format(value),
                 },
                 splitLine: { show: false },
               }}

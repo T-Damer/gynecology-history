@@ -97,13 +97,13 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
   const cytologySeries = datedVisits.map((visit) => {
     const statusIndex = getStatusIndex(visit.cytology, statusCategories)
 
-    return statusIndex === null ? null : statusIndex
+    return statusIndex === null ? null : statusIndex + 1
   })
 
   const colposcopySeries = datedVisits.map((visit) => {
     const statusIndex = getStatusIndex(visit.colposcopy, statusCategories)
 
-    return statusIndex === null ? null : statusIndex
+    return statusIndex === null ? null : statusIndex + 1
   })
 
   return (
@@ -142,7 +142,7 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
             }}
           >
             <EChart
-              className="h-80 w-full"
+              className="h-[32rem] w-full"
               use={[
                 GridComponent,
                 LegendComponent,
@@ -161,7 +161,7 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                 left: 12,
                 right: 18,
                 top: 88,
-                bottom: 64,
+                bottom: 76,
                 containLabel: true,
               }}
               tooltip={{
@@ -178,7 +178,7 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                     `<strong>${visit.label}</strong>`,
                     `Визит ${visit.visitNumber}`,
                     ...points.map((point) => {
-                      const statusIndex = Number(point.value)
+                      const statusIndex = Number(point.value) - 1
                       const value =
                         Number.isFinite(statusIndex) &&
                         statusCategories[statusIndex]
@@ -204,10 +204,11 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
               yAxis={{
                 type: 'value',
                 min: 0,
-                max: Math.max(statusCategories.length - 1, 0),
+                max: Math.max(statusCategories.length, 0),
                 interval: 1,
                 axisLabel: {
-                  formatter: (value: number) => statusCategories[value] ?? '',
+                  formatter: (value: number) =>
+                    value > 0 ? (statusCategories[value - 1] ?? '') : '',
                 },
               }}
               series={[
@@ -216,14 +217,24 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                   type: 'bar',
                   data: cytologySeries,
                   itemStyle: { color: '#2563eb' },
-                  barMaxWidth: 28,
+                  barMaxWidth: 14,
+                  barMinHeight: 4,
+                  showBackground: true,
+                  backgroundStyle: {
+                    color: 'rgba(148, 163, 184, 0.12)',
+                  },
                 },
                 {
                   name: 'Кольпоскопия',
                   type: 'bar',
                   data: colposcopySeries,
                   itemStyle: { color: '#dc2626' },
-                  barMaxWidth: 28,
+                  barMaxWidth: 14,
+                  barMinHeight: 4,
+                  showBackground: true,
+                  backgroundStyle: {
+                    color: 'rgba(148, 163, 184, 0.12)',
+                  },
                 },
               ]}
             />
