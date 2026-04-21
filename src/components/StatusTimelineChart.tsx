@@ -25,6 +25,8 @@ const valueSymbols = [
   'arrow',
   'path://M0,-9 L2.2,-2.8 L8.6,-2.8 L3.4,1.1 L5.5,7.5 L0,3.8 L-5.5,7.5 L-3.4,1.1 L-8.6,-2.8 L-2.2,-2.8 Z',
 ] as const
+const cytologyOffsetMs = -3 * 60 * 60 * 1000
+const colposcopyOffsetMs = 3 * 60 * 60 * 1000
 
 function scrollToVisit(visitNumber: number) {
   const element = document.getElementById(`visit-${visitNumber}`)
@@ -96,6 +98,7 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
     new Set([...cytologyOptions, ...colposcopyOptions])
   )
   const isComplete = hasAllVisitDates && hasAnyStatuses
+  const chartMinWidth = Math.max(720, datedVisits.length * 120)
 
   const series = [
     {
@@ -108,11 +111,11 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
       data: datedVisits.map((visit) =>
         visit.cytology
           ? {
-              value: [visit.timestamp, visit.cytology],
+              value: [visit.timestamp + cytologyOffsetMs, visit.cytology],
               symbol: getSymbolForValue(visit.cytology, cytologyOptions),
               symbolSize: 14,
             }
-          : [visit.timestamp, null]
+          : [visit.timestamp + cytologyOffsetMs, null]
       ),
     },
     {
@@ -125,11 +128,11 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
       data: datedVisits.map((visit) =>
         visit.colposcopy
           ? {
-              value: [visit.timestamp, visit.colposcopy],
+              value: [visit.timestamp + colposcopyOffsetMs, visit.colposcopy],
               symbol: getSymbolForValue(visit.colposcopy, colposcopyOptions),
               symbolSize: 14,
             }
-          : [visit.timestamp, null]
+          : [visit.timestamp + colposcopyOffsetMs, null]
       ),
     },
   ]
@@ -158,70 +161,80 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
       </div>
 
       {isComplete ? (
-        <div
-          className="relative w-full min-h-72"
-          style={{
-            background:
-              'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
-            backgroundSize: '12px 12px',
-          }}
-        >
-          <EChart
-            className="h-80 w-full"
-            use={[
-              GridComponent,
-              LegendComponent,
-              TooltipComponent,
-              LineChart,
-              CanvasRenderer,
-            ]}
-            renderer="canvas"
-            legend={{ top: 0 }}
-            grid={{
-              left: 12,
-              right: 18,
-              top: 72,
-              bottom: 28,
-              containLabel: true,
+        <div className="-mx-1 overflow-x-auto px-1 pb-2">
+          <div
+            className="relative min-h-72"
+            style={{
+              minWidth: `${chartMinWidth}px`,
+              background:
+                'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
+              backgroundSize: '12px 12px',
             }}
-            tooltip={{
-              trigger: 'axis',
-              formatter: (params) => {
-                const points = Array.isArray(params) ? params : [params]
-                const firstValue = points[0]?.value as [number, string | null]
-                const timestamp = firstValue?.[0]
+          >
+            <EChart
+              className="h-80 w-full"
+              use={[
+                GridComponent,
+                LegendComponent,
+                TooltipComponent,
+                LineChart,
+                CanvasRenderer,
+              ]}
+              renderer="canvas"
+              legend={{
+                top: 0,
+                left: 0,
+                right: 0,
+                type: 'scroll',
+              }}
+              grid={{
+                left: 12,
+                right: 18,
+                top: 88,
+                bottom: 52,
+                containLabel: true,
+              }}
+              tooltip={{
+                trigger: 'axis',
+                formatter: (params) => {
+                  const points = Array.isArray(params) ? params : [params]
+                  const firstValue = points[0]?.value as [number, string | null]
+                  const timestamp = firstValue?.[0]
 
-                return [
-                  `<strong>${formatVisitDate(timestamp)}</strong>`,
-                  ...points.map((point) => {
-                    const [, value] = point.value as [number, string | null]
+                  return [
+                    `<strong>${formatVisitDate(timestamp)}</strong>`,
+                    ...points.map((point) => {
+                      const [, value] = point.value as [number, string | null]
 
-                    return `${point.marker}${point.seriesName}: ${value || '—'}`
-                  }),
-                ].join('<br/>')
-              },
-            }}
-            xAxis={{
-              type: 'time',
-              axisLabel: {
-                color: 'currentColor',
-                formatter: (value: number) =>
-                  new Intl.DateTimeFormat('ru-RU', {
-                    day: '2-digit',
-                    month: '2-digit',
-                  }).format(value),
-              },
-              splitLine: { show: false },
-            }}
-            yAxis={{
-              type: 'category',
-              data: statusCategories,
-              axisLabel: {
-                interval: 0,
-              },
-            }}
-            series={series}
-          />
+                      return `${point.marker}${point.seriesName}: ${value || '—'}`
+                    }),
+                  ].join('<br/>')
+                },
+              }}
+              xAxis={{
+                type: 'time',
+                axisLabel: {
+                  color: 'currentColor',
+                  hideOverlap: true,
+                  rotate: 30,
+                  formatter: (value: number) =>
+                    new Intl.DateTimeFormat('ru-RU', {
+                      day: '2-digit',
+                      month: '2-digit',
+                    }).format(value),
+                },
+                splitLine: { show: false },
+              }}
+              yAxis={{
+                type: 'category',
+                data: statusCategories,
+                axisLabel: {
+                  interval: 0,
+                },
+              }}
+              series={series}
+            />
+          </div>
         </div>
       ) : (
         <div className="flex min-h-72 items-center justify-center rounded-box border border-dashed border-base-300 bg-base-200/30 px-6 text-center text-sm font-medium">

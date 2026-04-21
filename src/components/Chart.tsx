@@ -113,6 +113,7 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
     (visit) => toTimestamp(visit.visitDate) !== null
   )
   const isComplete = hasAllVisitDates && uniqueTypes.length > 0
+  const chartMinWidth = Math.max(720, datedVisits.length * 120)
 
   const series = uniqueTypes.map((type, index) => ({
     name: `ВПЧ ${type}`,
@@ -157,77 +158,84 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
       </div>
 
       {isComplete ? (
-        <div
-          className="relative w-full min-h-72"
-          style={{
-            background:
-              'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
-            backgroundSize: '12px 12px',
-          }}
-        >
-          <EChart
-            className="h-72 w-full"
-            use={[
-              GridComponent,
-              LegendComponent,
-              TooltipComponent,
-              LineChart,
-              CanvasRenderer,
-            ]}
-            renderer="canvas"
-            legend={{
-              top: 0,
+        <div className="-mx-1 overflow-x-auto px-1 pb-2">
+          <div
+            className="relative min-h-72"
+            style={{
+              minWidth: `${chartMinWidth}px`,
+              background:
+                'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
+              backgroundSize: '12px 12px',
             }}
-            grid={{
-              left: 12,
-              right: 18,
-              top: 72,
-              bottom: 28,
-              containLabel: true,
-            }}
-            tooltip={{
-              trigger: 'axis',
-              valueFormatter: (value) =>
-                typeof value === 'number' ? value.toFixed(2) : String(value),
-              formatter: (params) => {
-                const points = Array.isArray(params) ? params : [params]
-                const [timestamp] = points[0].value as [number, number]
+          >
+            <EChart
+              className="h-72 w-full"
+              use={[
+                GridComponent,
+                LegendComponent,
+                TooltipComponent,
+                LineChart,
+                CanvasRenderer,
+              ]}
+              renderer="canvas"
+              legend={{
+                top: 0,
+                left: 0,
+                right: 0,
+                type: 'scroll',
+              }}
+              grid={{
+                left: 12,
+                right: 18,
+                top: 88,
+                bottom: 52,
+                containLabel: true,
+              }}
+              tooltip={{
+                trigger: 'axis',
+                valueFormatter: (value) =>
+                  typeof value === 'number' ? value.toFixed(2) : String(value),
+                formatter: (params) => {
+                  const points = Array.isArray(params) ? params : [params]
+                  const [timestamp] = points[0].value as [number, number]
 
-                return [
-                  `<strong>${formatVisitDate(timestamp)}</strong>`,
-                  formatVisitDate(timestamp),
-                  ...points.map((point) => {
-                    const [, viralLoad] = point.value as [number, number]
+                  return [
+                    `<strong>${formatVisitDate(timestamp)}</strong>`,
+                    ...points.map((point) => {
+                      const [, viralLoad] = point.value as [number, number]
 
-                    return `${point.marker}${point.seriesName}: ${viralLoad.toFixed(2)}`
-                  }),
-                ].join('<br/>')
-              },
-            }}
-            xAxis={{
-              type: 'time',
-              axisLabel: {
-                color: 'currentColor',
-                formatter: (value: number) =>
-                  new Intl.DateTimeFormat('ru-RU', {
-                    day: '2-digit',
-                    month: '2-digit',
-                  }).format(value),
-              },
-              splitLine: { show: false },
-            }}
-            yAxis={{
-              type: 'value',
-              name: 'ВПЧ логарифм',
-              nameTextStyle: {
-                color: 'currentColor',
-              },
-              axisLabel: {
-                formatter: (value: number) => value.toFixed(1),
-              },
-            }}
-            series={series}
-          />
+                      return `${point.marker}${point.seriesName}: ${viralLoad.toFixed(2)}`
+                    }),
+                  ].join('<br/>')
+                },
+              }}
+              xAxis={{
+                type: 'time',
+                axisLabel: {
+                  color: 'currentColor',
+                  hideOverlap: true,
+                  rotate: 30,
+                  formatter: (value: number) =>
+                    new Intl.DateTimeFormat('ru-RU', {
+                      day: '2-digit',
+                      month: '2-digit',
+                    }).format(value),
+                },
+                splitLine: { show: false },
+              }}
+              yAxis={{
+                type: 'value',
+                name: 'ВПЧ логарифм',
+                nameTextStyle: {
+                  color: 'currentColor',
+                },
+                axisLabel: {
+                  formatter: (value: number) => value.toFixed(1),
+                },
+              }}
+              series={series}
+            />
+          </div>
         </div>
       ) : (
         <div className="flex min-h-72 items-center justify-center rounded-box border border-dashed border-base-300 bg-base-200/30 px-6 text-center text-sm font-medium">
