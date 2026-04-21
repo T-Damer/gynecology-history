@@ -1,6 +1,6 @@
 import { EChart } from '@kbox-labs/react-echarts'
 import { colposcopyOptions, cytologyOptions } from 'config/formSchema'
-import { LineChart } from 'echarts/charts'
+import { BarChart } from 'echarts/charts'
 import {
   GridComponent,
   LegendComponent,
@@ -14,19 +14,6 @@ interface VisitStatusPoint {
   cytology: string | number | undefined
   colposcopy: string | number | undefined
 }
-
-const valueSymbols = [
-  'circle',
-  'rect',
-  'roundRect',
-  'triangle',
-  'diamond',
-  'pin',
-  'arrow',
-  'path://M0,-9 L2.2,-2.8 L8.6,-2.8 L3.4,1.1 L5.5,7.5 L0,3.8 L-5.5,7.5 L-3.4,1.1 L-8.6,-2.8 L-2.2,-2.8 Z',
-] as const
-const cytologyOffsetMs = -3 * 60 * 60 * 1000
-const colposcopyOffsetMs = 3 * 60 * 60 * 1000
 
 function scrollToVisit(visitNumber: number) {
   const element = document.getElementById(`visit-${visitNumber}`)
@@ -58,9 +45,14 @@ function normalizeStatusValue(value: string | number | undefined) {
   return normalized || undefined
 }
 
-function getSymbolForValue(value: string, values: string[]) {
-  const index = values.indexOf(value)
-  return valueSymbols[(index >= 0 ? index : 0) % valueSymbols.length]
+function getStatusIndex(
+  value: string | undefined,
+  categories: string[]
+): number | null {
+  if (!value) return null
+
+  const index = categories.indexOf(value)
+  return index >= 0 ? index : null
 }
 
 export default function ({ visits }: { visits: VisitStatusPoint[] }) {
@@ -72,6 +64,7 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
       return {
         visitNumber: visit.visitNumber,
         timestamp,
+        label: formatVisitDate(timestamp),
         cytology: normalizeStatusValue(visit.cytology),
         colposcopy: normalizeStatusValue(visit.colposcopy),
       }
@@ -82,6 +75,7 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
       ): visit is {
         visitNumber: number
         timestamp: number
+        label: string
         cytology: string | undefined
         colposcopy: string | undefined
       } => Boolean(visit)
@@ -100,42 +94,17 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
   const isComplete = hasAllVisitDates && hasAnyStatuses
   const chartMinWidth = Math.max(720, datedVisits.length * 120)
 
-  const series = [
-    {
-      name: 'Цитология',
-      type: 'line' as const,
-      color: '#2563eb',
-      lineStyle: { width: 3, color: '#2563eb' },
-      itemStyle: { color: '#2563eb' },
-      connectNulls: false,
-      data: datedVisits.map((visit) =>
-        visit.cytology
-          ? {
-              value: [visit.timestamp + cytologyOffsetMs, visit.cytology],
-              symbol: getSymbolForValue(visit.cytology, cytologyOptions),
-              symbolSize: 14,
-            }
-          : [visit.timestamp + cytologyOffsetMs, null]
-      ),
-    },
-    {
-      name: 'Кольпоскопия',
-      type: 'line' as const,
-      color: '#dc2626',
-      lineStyle: { width: 3, color: '#dc2626' },
-      itemStyle: { color: '#dc2626' },
-      connectNulls: false,
-      data: datedVisits.map((visit) =>
-        visit.colposcopy
-          ? {
-              value: [visit.timestamp + colposcopyOffsetMs, visit.colposcopy],
-              symbol: getSymbolForValue(visit.colposcopy, colposcopyOptions),
-              symbolSize: 14,
-            }
-          : [visit.timestamp + colposcopyOffsetMs, null]
-      ),
-    },
-  ]
+  const cytologySeries = datedVisits.map((visit) => {
+    const statusIndex = getStatusIndex(visit.cytology, statusCategories)
+
+    return statusIndex === null ? null : statusIndex
+  })
+
+  const colposcopySeries = datedVisits.map((visit) => {
+    const statusIndex = getStatusIndex(visit.colposcopy, statusCategories)
+
+    return statusIndex === null ? null : statusIndex
+  })
 
   return (
     <section className="rounded-box border-2 border-neutral-content p-4">
@@ -144,7 +113,8 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
           Динамика цитологии и кольпоскопии
         </h2>
         <p className="m-0 text-sm opacity-70">
-          Цвет показывает линию, фигура показывает значение на визите.
+          Для каждой даты показываются отдельные столбцы цитологии и
+          кольпоскопии.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {visits.map((visit) => (
@@ -177,7 +147,7 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                 GridComponent,
                 LegendComponent,
                 TooltipComponent,
-                LineChart,
+                BarChart,
                 CanvasRenderer,
               ]}
               renderer="canvas"
@@ -191,48 +161,71 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                 left: 12,
                 right: 18,
                 top: 88,
-                bottom: 52,
+                bottom: 64,
                 containLabel: true,
               }}
               tooltip={{
                 trigger: 'axis',
+                axisPointer: {
+                  type: 'shadow',
+                },
                 formatter: (params) => {
                   const points = Array.isArray(params) ? params : [params]
-                  const firstValue = points[0]?.value as [number, string | null]
-                  const timestamp = firstValue?.[0]
+                  const pointIndex = points[0]?.dataIndex ?? 0
+                  const visit = datedVisits[pointIndex]
 
                   return [
-                    `<strong>${formatVisitDate(timestamp)}</strong>`,
+                    `<strong>${visit.label}</strong>`,
+                    `Визит ${visit.visitNumber}`,
                     ...points.map((point) => {
-                      const [, value] = point.value as [number, string | null]
+                      const statusIndex = Number(point.value)
+                      const value =
+                        Number.isFinite(statusIndex) &&
+                        statusCategories[statusIndex]
+                          ? statusCategories[statusIndex]
+                          : '—'
 
-                      return `${point.marker}${point.seriesName}: ${value || '—'}`
+                      return `${point.marker}${point.seriesName}: ${value}`
                     }),
                   ].join('<br/>')
                 },
               }}
               xAxis={{
-                type: 'time',
+                type: 'category',
+                data: datedVisits.map((visit) => visit.label),
                 axisLabel: {
                   color: 'currentColor',
+                  interval: 0,
                   hideOverlap: true,
                   rotate: 30,
-                  formatter: (value: number) =>
-                    new Intl.DateTimeFormat('ru-RU', {
-                      day: '2-digit',
-                      month: '2-digit',
-                    }).format(value),
                 },
                 splitLine: { show: false },
               }}
               yAxis={{
-                type: 'category',
-                data: statusCategories,
+                type: 'value',
+                min: 0,
+                max: Math.max(statusCategories.length - 1, 0),
+                interval: 1,
                 axisLabel: {
-                  interval: 0,
+                  formatter: (value: number) => statusCategories[value] ?? '',
                 },
               }}
-              series={series}
+              series={[
+                {
+                  name: 'Цитология',
+                  type: 'bar',
+                  data: cytologySeries,
+                  itemStyle: { color: '#2563eb' },
+                  barMaxWidth: 28,
+                },
+                {
+                  name: 'Кольпоскопия',
+                  type: 'bar',
+                  data: colposcopySeries,
+                  itemStyle: { color: '#dc2626' },
+                  barMaxWidth: 28,
+                },
+              ]}
             />
           </div>
         </div>
