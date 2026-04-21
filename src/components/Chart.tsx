@@ -1,11 +1,12 @@
 import { EChart } from '@kbox-labs/react-echarts'
-import { BarChart } from 'echarts/charts'
+import { LineChart } from 'echarts/charts'
 import {
   GridComponent,
   LegendComponent,
   TooltipComponent,
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
+import useTheme from 'hooks/useTheme'
 
 interface VisitChartPoint {
   visitNumber: number
@@ -29,10 +30,6 @@ const chartColors = [
   '#ec4899',
   '#14b8a6',
 ]
-const minBarsPerVisit = 2
-const barWidthPx = 10
-const barGapPx = 4
-const slotPaddingPx = 8
 const chartSideSpacePx = 120
 
 function scrollToVisit(visitNumber: number) {
@@ -87,6 +84,10 @@ function formatVisitDate(timestamp: number) {
 }
 
 export default function ({ visits }: { visits: VisitChartPoint[] }) {
+  const theme = useTheme()
+  const chartTextColor = theme === 'dark' ? '#f3f4f6' : '#111827'
+  const chartAxisColor =
+    theme === 'dark' ? 'rgba(243, 244, 246, 0.28)' : 'rgba(17, 24, 39, 0.18)'
   const datedVisits = visits
     .map((visit) => {
       const timestamp = toTimestamp(visit.visitDate)
@@ -120,29 +121,25 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
     (visit) => toTimestamp(visit.visitDate) !== null
   )
   const isComplete = hasAllVisitDates && uniqueTypes.length > 0
-  const barsPerVisit = Math.max(minBarsPerVisit, uniqueTypes.length)
-  const visitSlotWidth =
-    barsPerVisit * barWidthPx +
-    Math.max(barsPerVisit - 1, 0) * barGapPx +
-    slotPaddingPx
-  const chartWidth = datedVisits.length * visitSlotWidth + chartSideSpacePx
+  const chartWidth = datedVisits.length * 72 + chartSideSpacePx
 
   const series = uniqueTypes.map((type, index) => ({
     name: `ВПЧ ${type}`,
-    type: 'bar' as const,
+    type: 'line' as const,
+    smooth: true,
+    symbol: 'circle' as const,
+    symbolSize: 10,
     data: datedVisits.map((visit) => {
       const matchingPoint = visit.hpvPoints.find((point) => point.type === type)
 
       return matchingPoint?.log ?? 0
     }),
-    itemStyle: {
+    lineStyle: {
+      width: 3,
       color: chartColors[index % chartColors.length],
     },
-    barWidth: barWidthPx,
-    barMinHeight: 4,
-    showBackground: true,
-    backgroundStyle: {
-      color: 'rgba(148, 163, 184, 0.12)',
+    itemStyle: {
+      color: chartColors[index % chartColors.length],
     },
   }))
 
@@ -151,8 +148,8 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
       <div className="mb-4">
         <h2 className="m-0 text-lg font-semibold">График вирусной нагрузки</h2>
         <p className="m-0 text-sm opacity-70">
-          Для каждого ВПЧ типа показывается отдельный тонкий столбец. Если на
-          визите логарифм не указан, используется 0.
+          Для каждого ВПЧ типа строится отдельная линия. Если на визите логарифм
+          не указан, используется 0.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {visits.map((visit) => (
@@ -171,9 +168,9 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
       {isComplete ? (
         <div className="-mx-1 overflow-x-auto px-1 pb-2">
           <div
-            className="relative inline-block min-h-72 align-top"
+            className="relative min-h-72"
             style={{
-              width: `${chartWidth}px`,
+              width: `max(100%, ${chartWidth}px)`,
               background:
                 'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
               backgroundSize: '12px 12px',
@@ -185,7 +182,7 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
                 GridComponent,
                 LegendComponent,
                 TooltipComponent,
-                BarChart,
+                LineChart,
                 CanvasRenderer,
               ]}
               renderer="canvas"
@@ -194,6 +191,9 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
                 left: 0,
                 right: 0,
                 type: 'scroll',
+                textStyle: {
+                  color: chartTextColor,
+                },
               }}
               grid={{
                 left: 12,
@@ -204,9 +204,6 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
               }}
               tooltip={{
                 trigger: 'axis',
-                axisPointer: {
-                  type: 'shadow',
-                },
                 valueFormatter: (value) =>
                   typeof value === 'number' ? value.toFixed(2) : String(value),
                 formatter: (params) => {
@@ -229,10 +226,15 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
                 type: 'category',
                 data: datedVisits.map((visit) => visit.label),
                 axisLabel: {
-                  color: 'currentColor',
+                  color: chartTextColor,
                   interval: 0,
                   hideOverlap: true,
                   rotate: 30,
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: chartAxisColor,
+                  },
                 },
                 splitLine: { show: false },
               }}
@@ -240,10 +242,21 @@ export default function ({ visits }: { visits: VisitChartPoint[] }) {
                 type: 'value',
                 name: 'ВПЧ логарифм',
                 nameTextStyle: {
-                  color: 'currentColor',
+                  color: chartTextColor,
                 },
                 axisLabel: {
+                  color: chartTextColor,
                   formatter: (value: number) => value.toFixed(1),
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: chartAxisColor,
+                  },
+                },
+                splitLine: {
+                  lineStyle: {
+                    color: chartAxisColor,
+                  },
                 },
               }}
               series={series}

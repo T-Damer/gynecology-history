@@ -7,6 +7,7 @@ import {
   TooltipComponent,
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
+import useTheme from 'hooks/useTheme'
 
 const minBarsPerVisit = 2
 const barWidthPx = 10
@@ -62,6 +63,10 @@ function getStatusIndex(
 }
 
 export default function ({ visits }: { visits: VisitStatusPoint[] }) {
+  const theme = useTheme()
+  const chartTextColor = theme === 'dark' ? '#f3f4f6' : '#111827'
+  const chartAxisColor =
+    theme === 'dark' ? 'rgba(243, 244, 246, 0.28)' : 'rgba(17, 24, 39, 0.18)'
   const datedVisits = visits
     .map((visit) => {
       const timestamp = toTimestamp(visit.visitDate)
@@ -143,9 +148,9 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
       {isComplete ? (
         <div className="-mx-1 overflow-x-auto px-1 pb-2">
           <div
-            className="relative inline-block min-h-72 align-top"
+            className="relative min-h-72"
             style={{
-              width: `${chartWidth}px`,
+              width: `max(100%, ${chartWidth}px)`,
               background:
                 'radial-gradient(color-mix(in srgb, currentColor 8%, transparent) 1px, transparent 0)',
               backgroundSize: '12px 12px',
@@ -166,6 +171,9 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                 left: 0,
                 right: 0,
                 type: 'scroll',
+                textStyle: {
+                  color: chartTextColor,
+                },
               }}
               grid={{
                 left: 8,
@@ -204,10 +212,15 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                 type: 'category',
                 data: datedVisits.map((visit) => visit.label),
                 axisLabel: {
-                  color: 'currentColor',
+                  color: chartTextColor,
                   interval: 0,
                   hideOverlap: true,
                   rotate: 30,
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: chartAxisColor,
+                  },
                 },
                 splitLine: { show: false },
               }}
@@ -217,8 +230,19 @@ export default function ({ visits }: { visits: VisitStatusPoint[] }) {
                 max: Math.max(statusCategories.length, 0),
                 interval: 1,
                 axisLabel: {
+                  color: chartTextColor,
                   formatter: (value: number) =>
                     value > 0 ? (statusCategories[value - 1] ?? '') : '',
+                },
+                axisLine: {
+                  lineStyle: {
+                    color: chartAxisColor,
+                  },
+                },
+                splitLine: {
+                  lineStyle: {
+                    color: chartAxisColor,
+                  },
                 },
               }}
               series={[
