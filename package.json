@@ -21,7 +21,7 @@
     "preact": "^10.24.3",
     "react-error-boundary": "^4.1.2",
     "react-toastify": "^10.0.6",
-    "uuid": "^11.1.0",
+    "uuid": "^14.0.0",
     "vite-plugin-pwa": "^0.20.5",
     "wouter-preact": "^3.3.5",
     "xlsx": "^0.18.5"
